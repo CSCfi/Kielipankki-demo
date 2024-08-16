@@ -1,3 +1,8 @@
+# Ansible / OpenStack
+ansible/clouds.yaml
+ansible/project_*-openrc.sh
+ansible/secure.yaml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
