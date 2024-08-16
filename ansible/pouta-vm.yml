@@ -1,0 +1,60 @@
+---
+
+- name: Create virtual machine on cPouta
+  hosts: localhost
+  remote_user: ubuntu
+  become: false
+  roles:
+    - role: kielipankki.common.create_instances
+      tags: create_instances
+  vars:
+    instance_name: 'demo'
+    vm_name_postfix: 'prod'
+    pouta_instance_name: "{{ instance_name }}-{{ vm_name_postfix }}"
+    project_sg: "demo-sg"
+    project_security_groups: "default,{{ project_sg }}"
+
+    servers:
+      - name: "{{ pouta_instance_name }}"
+        image: "{{ std_image }}"
+        network: "{{ network }}"
+        flavor: standard.medium
+        key_name: "{{ project_key }}"
+        security_groups: "{{ project_security_groups }}"
+        # network: public
+        # access_ipv4: 86.50.169.164
+        # auto_ip: false
+        # floating_ip: 86.50.169.164
+        meta:
+          hostname: "{{ pouta_instance_name }}"
+          group: "{{ instance_name }}"
+
+    
+    security_group_rules:
+      - name: ping
+        protocol: icmp
+        port: -1
+        allowed_ips:
+          - "193.167.254.68/32" #opsview
+
+      - name: ssh
+        protocol: tcp
+        port: 22
+        allowed_ips:
+          - "193.166.1.0/24" #CSC Office
+          - "193.166.2.0/24" #CSC Office
+          - "193.166.84.0/24" #CSC VPN
+          - "193.166.85.0/24" #CSC VPN
+
+      - name: http
+        protocol: tcp
+        port: 80
+        allowed_ips:
+          - "195.148.30.109/32" #Kielipankki-proxy-pre-prod
+          - "195.148.30.210/32" #Kielipankki-proxy-prod
+
+    authorized_users:
+      - ktegel
+      - ajarven
+      - matthies
+      - shardwic

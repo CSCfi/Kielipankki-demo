@@ -1,0 +1,11 @@
+---
+
+- name: Create Pouta VM
+  ansible.builtin.import_playbook: pouta-vm.yml
+
+- name: Setup demo endpoint
+  hosts: kielipankki-demo-vm
+  roles:
+#    - lighttpd
+#    - firewall
+#    - cgi-bin

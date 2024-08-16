@@ -1,0 +1,10 @@
+all:
+  hosts:
+    localhost:
+      ansible_connection: local
+      floating_ip: 86.50.170.142
+      vm_name_postfix: prod
+      ansible_python_interpreter: python
+    kielipankki-demo-vm:
+      ansible_user: ubuntu
+      ansible_host: 86.50.170.142
