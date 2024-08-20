@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import os, sys  # , stat
+import os, sys
 import time
 import subprocess
 from subprocess import Popen, PIPE
@@ -15,7 +15,9 @@ second = lambda x: x[1]
 
 hostname = "http://" + open("host.txt").read()
 kp_hostname = "https://kielipankki.fi"
-wrkdir = "/var/www/kielipankki-tools"
+sitedir = "/var/www"
+wrkdir = sitedir + "/kielipankki-tools"
+tmpdir = sitedir + "/tmp"
 path_to_tagtools = "/usr/local/bin/"
 
 kpdemos_header = """
@@ -83,7 +85,7 @@ def tokenize(text):
 
 
 def clean_tempfiles():
-    subprocess.call(["/var/www/kielipankki-tools/clean-tmpfiles"])
+    subprocess.call(["clean-tmpfiles"])
 
 
 def text_from_file(form_file):
@@ -101,7 +103,7 @@ def text_from_file(form_file):
         except UnicodeDecodeError:
             file_content = file_contents.decode("latin1").encode("utf-8")
         return file_contents
-    uploaded_file_path = os.path.join(wrkdir + "/tmp/", "upload_" + hashcode + ext)
+    uploaded_file_path = os.path.join(tmpdir, "upload_" + hashcode + ext)
     with open(uploaded_file_path, "wb") as f:
         f.write(form_file.file.read())
     if ext in (".png", ".jpg", ".jpeg", ".gif", ".tiff"):
@@ -147,7 +149,7 @@ def ocr_from_file(form_file, lang):
         except UnicodeDecodeError:
             file_content = file_contents.decode("latin1").encode("utf-8")
         return file_contents, hashcode, ""
-    uploaded_file_path = os.path.join(wrkdir + "/tmp/upload_" + hashcode + ext)
+    uploaded_file_path = os.path.join(tmpdir + "upload_" + hashcode + ext)
     with open(uploaded_file_path, "wb") as f:
         f.write(form_file.file.read())
     if ext in (".png", ".jpg", ".jpeg", ".gif", "pdf", "svg", "tiff"):
@@ -260,20 +262,18 @@ rows2tsv = make_tsv
 
 def write_tsv(tsv, session_key, dest_dir=None):
     if not dest_dir:
-        dest_dir = wrkdir + "/tmp/"
+        dest_dir = tmpdir
     with open(dest_dir + session_key + ".tsv", "w", encoding="utf-8") as f:
         f.write(tsv)
 
 
 def write_txt(txt, session_key):
-    with open(wrkdir + "/tmp/" + session_key + ".txt", "w", encoding="utf-8") as f:
+    with open(tmpdir + "/" + session_key + ".txt", "w", encoding="utf-8") as f:
         f.write(txt + "\n")
 
 
 def write_file(data, extension, session_key):
-    with open(
-        wrkdir + "/tmp/" + session_key + "." + extension, "w", encoding="utf-8"
-    ) as f:
+    with open(tmpdir + "/" + session_key + "." + extension, "w", encoding="utf-8") as f:
         f.write(data)
 
 
@@ -422,7 +422,7 @@ def write_excel(rows, filename, title):
     for column_cells in ws.columns:
         length = min(max(len(str(cell.value)) for cell in column_cells), 20)
         ws.column_dimensions[column_cells[0].column].width = length + 3
-    wb.save(wrkdir + "/tmp/" + filename + ".xlsx")
+    wb.save(tmpdir + "/" + filename + ".xlsx")
 
 
 def write_docx(txt, session_key, title):
@@ -432,7 +432,7 @@ def write_docx(txt, session_key, title):
     document.add_heading(title, 0)
     document.add_paragraph(re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", "", txt))
     # document.add_paragraph(re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\xff]', '', txt))
-    document.save(wrkdir + "/tmp/" + session_key + ".docx")
+    document.save(tmpdir + "/" + session_key + ".docx")
 
 
 kielipankki_texttools_api_url = "http://kielipankki.rahtiapp.fi/text/fi"

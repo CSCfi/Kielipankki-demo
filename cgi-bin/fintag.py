@@ -7,15 +7,16 @@ import time
 import hashlib
 import os
 import cgitb
+
 cgitb.enable()
 
 from kpdemos import *
 
-populate_js = '''
+populate_js = """
 function populateTextField() {
 document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syyskuuta 1900 Pielavesi – 31. elokuuta 1986 Helsinki) oli suomalainen poliitikko ja kahdeksas Suomen tasavallan presidentti. Hän oli tasavallan istuva presidentti yhtäjaksoisesti vuodesta 1956 alkuvuoteen 1982, yli 25 vuoden ajan. Viimeinen presidenttikausi jäi kesken sairauden takia. Kekkonen on Suomen historian pitkäaikaisin presidentti. Hän on ensimmäinen henkilö, joka toimi tasavallan presidenttinä kaksi kokonaista kautta ja ainoa, joka on valittu toimeensa useammaksi kuin kahdeksi kaudeksi, mikä ei perustuslakiin eli entiseen Suomen hallitusmuotoon myöhemmin tehdyn muutoksen ja nykyisen Suomen perustuslain mukaan olisi enää mahdollistakaan. Ennen presidenttiyttään Kekkonen toimi muun muassa juristina, yleisurheilijana, oikeusministerinä, eduskunnan puhemiehenä sekä viiden hallituksen pääministerinä. Presidentin valitsijamiehenä, kansanedustajana ja ministerinä Kekkonen oli valitsemassa Kyösti Kalliota vuonna 1937, Risto Rytiä vuosina 1940 ja 1943, Gustaf Mannerheimia vuonna 1944 sekä J. K. Paasikiveä vuonna 1946.";
 }
-'''
+"""
 
 # download_js = '''
 # function download(filename, text) {
@@ -32,62 +33,78 @@ document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syysk
 # }
 # '''
 
+
 def rewrite_bio(tag):
-    if tag == 'O':
-        return ''
+    if tag == "O":
+        return ""
     return tag
+
 
 def rewrite_finer_to_bio(rows):
     def xml2bio(tag):
-        if 'Prs' in tag: return 'PER'
-        elif 'Loc' in tag: return 'LOC'
-        elif 'Org' in tag: return 'ORG'
-        else: return 'MISC'
-
-    tag, state = '', 'O'
-    for row in rows:
-        if row[3].startswith('</'):
-            tag = xml2bio(row[3][2:-1])
-            row[3] = 'I-' + tag
-            state = 'O'
-        elif row[3].endswith('/>'):
-            tag = xml2bio(row[3][1:-2])
-            row[3] = 'B-' + tag
-            state = 'O'
-        elif row[3].startswith('<'):
-            tag = xml2bio(row[3][1:-1])
-            row[3] = 'B-' + tag
-            state = 'I'
+        if "Prs" in tag:
+            return "PER"
+        elif "Loc" in tag:
+            return "LOC"
+        elif "Org" in tag:
+            return "ORG"
         else:
-            if state == 'I':
-                row[3] = 'I-' + tag
+            return "MISC"
+
+    tag, state = "", "O"
+    for row in rows:
+        if row[3].startswith("</"):
+            tag = xml2bio(row[3][2:-1])
+            row[3] = "I-" + tag
+            state = "O"
+        elif row[3].endswith("/>"):
+            tag = xml2bio(row[3][1:-2])
+            row[3] = "B-" + tag
+            state = "O"
+        elif row[3].startswith("<"):
+            tag = xml2bio(row[3][1:-1])
+            row[3] = "B-" + tag
+            state = "I"
+        else:
+            if state == "I":
+                row[3] = "I-" + tag
             else:
-                row[3] = ''
+                row[3] = ""
+
 
 def rewrite_finer_col_to_xbio(cols):
     retval = []
-    tag, state = '', 'O'
+    tag, state = "", "O"
     for col in cols:
-        if col.startswith('</'):
+        if col.startswith("</"):
             tag = col[2:-1]
-            retval.append('I-' + tag)
-            state = 'O'
-        elif col.endswith('/>'):
+            retval.append("I-" + tag)
+            state = "O"
+        elif col.endswith("/>"):
             tag = col[1:-2]
-            retval.append('B-' + tag)
-            state = 'O'
-        elif col.startswith('<'):
+            retval.append("B-" + tag)
+            state = "O"
+        elif col.startswith("<"):
             tag = col[1:-1]
-            retval.append('B-' + tag)
-            state = 'I'
+            retval.append("B-" + tag)
+            state = "I"
         else:
-            if state == 'I':
-                retval.append('I-' + tag)
+            if state == "I":
+                retval.append("I-" + tag)
             else:
-                retval.append('')
+                retval.append("")
     return retval
-                
-column_names = ["Surface form", "Lemma", "Morphology", "Modern named entity", "Extended modern named entity", "Historical Named Entity"]
+
+
+column_names = [
+    "Surface form",
+    "Lemma",
+    "Morphology",
+    "Modern named entity",
+    "Extended modern named entity",
+    "Historical Named Entity",
+]
+
 
 def print_content():
     time_start = time.time()
@@ -100,22 +117,32 @@ def print_content():
     if "file" in form and form["file"].filename != "":
         inputval = text_from_file(form["file"])
     if inputval != "":
-#        nertagger = form["lang"].value
+        #        nertagger = form["lang"].value
         process = Popen([wrkdir + "/run-nertag"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate(input=inputval)
         session_key = hashlib.md5(out).hexdigest()
-        out_rows = tsv2rows(out.decode('utf-8'))#permute_rows(tsv2rows(out.decode("utf-8")), (0, 1, 3, 2))
+        out_rows = tsv2rows(
+            out.decode("utf-8")
+        )  # permute_rows(tsv2rows(out.decode("utf-8")), (0, 1, 3, 2))
         extended_tags = extract_column(out_rows, 3)
-#        log(str(out_rows))
+        #        log(str(out_rows))
         extended_tags = rewrite_finer_col_to_xbio(extended_tags)
         rewrite_finer_to_bio(out_rows)
-        tokens = ' '.join(extract_column(out_rows, 0))
-        process = Popen([wrkdir + "/run-hisner-prs-loc"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        out, err = process.communicate(input=tokens.encode('utf-8'))
-        hisner_prs_loc_tags = map(rewrite_bio, extract_column(tsv2rows(out.decode('utf-8')), 1))
-        process = Popen([wrkdir + "/run-hisner-org"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
-        out, err = process.communicate(input=tokens.encode('utf-8'))
-        hisner_org_tags = map(rewrite_bio, extract_column(tsv2rows(out.decode('utf-8')), 1))
+        tokens = " ".join(extract_column(out_rows, 0))
+        process = Popen(
+            [wrkdir + "/run-hisner-prs-loc"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+        )
+        out, err = process.communicate(input=tokens.encode("utf-8"))
+        hisner_prs_loc_tags = map(
+            rewrite_bio, extract_column(tsv2rows(out.decode("utf-8")), 1)
+        )
+        process = Popen(
+            [wrkdir + "/run-hisner-org"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+        )
+        out, err = process.communicate(input=tokens.encode("utf-8"))
+        hisner_org_tags = map(
+            rewrite_bio, extract_column(tsv2rows(out.decode("utf-8")), 1)
+        )
         hisner_tags = zip(hisner_prs_loc_tags, hisner_org_tags)
         hisner_tags = list(map(lambda x: x[0] + " " + x[1], hisner_tags))
         out_rows = paste_new_column(out_rows, extended_tags)
@@ -123,18 +150,20 @@ def print_content():
         write_excel([column_names] + out_rows, session_key, "Output from fintag")
         write_tsv(make_tsv([column_names] + out_rows), session_key)
         result += "<p>Result:</p>\n"
-        result += '''
+        result += """
         <div class="row">
         <div class="col-md-auto">
-        <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.tsv" download="ner_tagged.tsv" role="button">Download TSV</a>
-        <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="ner_tagged.xlsx" role="button">Download Excel spreadsheet</a>
+        <a class="btn btn-info" href="{html_root}/tmp/{filename}.tsv" download="ner_tagged.tsv" role="button">Download TSV</a>
+        <a class="btn btn-info" href="{html_root}/tmp/{filename}.xlsx" download="ner_tagged.xlsx" role="button">Download Excel spreadsheet</a>
         </div>
         </div>
-        '''.format(html_root = hostname, filename = session_key)
-        result += make_table(out_rows, header = column_names) + "\n"
+        """.format(
+            html_root=hostname, filename=session_key
+        )
+        result += make_table(out_rows, header=column_names) + "\n"
 
     body = wrap_in_tags("fintag demo", "h2")
-    body += '''
+    body += """
 <h6>Annotate running text with FinnPos, FiNER and HisNER.</h6>
 <a href="#help" data-toggle="collapse">Show help</a>
 <div class="collapse" id="help">
@@ -195,9 +224,19 @@ def print_content():
   </div>
 </div>
 <p><small>Page generated in {TIME_SPENT:.2f} seconds</small></p>
-'''.format(scriptname = os.path.basename(sys.argv[0]), content = result, TIME_SPENT = time.time() - time_start)
+""".format(
+        scriptname=os.path.basename(sys.argv[0]),
+        content=result,
+        TIME_SPENT=time.time() - time_start,
+    )
 
-    sys.stdout.buffer.write(wrap_html(make_head(title = 'fintag demo', scripts = (populate_js,)), wrap_in_tags(body, 'div', attribs='class="container pt-1"', oneline = False)).encode("utf-8"))
+    sys.stdout.buffer.write(
+        wrap_html(
+            make_head(title="fintag demo", scripts=(populate_js,)),
+            wrap_in_tags(body, "div", attribs='class="container pt-1"', oneline=False),
+        ).encode("utf-8")
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print_content()
