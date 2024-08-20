@@ -85,7 +85,7 @@ def tokenize(text):
 
 
 def clean_tempfiles():
-    subprocess.call(["clean-tmpfiles"])
+    subprocess.call(["/usr/local/bin/clean-tmpfiles"])
 
 
 def text_from_file(form_file):
