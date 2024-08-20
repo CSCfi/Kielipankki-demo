@@ -13,7 +13,7 @@ import textract
 first = lambda x: x[0]
 second = lambda x: x[1]
 
-hostname = "http://" + open("host.txt")
+hostname = "http://" + open("host.txt").read()
 kp_hostname = "https://kielipankki.fi"
 wrkdir = "/var/www/kielipankki-tools"
 path_to_tagtools = "/usr/local/bin/"
