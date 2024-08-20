@@ -70,7 +70,7 @@ def print_content():
         <iframe id="parseResult" title="Parse result" width="1200px" height="720px" scrolling="auto" src="{parsed_html_file}">
         </iframe>
         """.format(
-            parsed_html_file=hostname + "/tools/demo/tmp/" + session_key + ".html"
+            parsed_html_file=hostname + "/tmp/" + session_key + ".html"
         )
     body = wrap_in_tags("finnish-parse demo", "h2")
     body += '<div class="row"><div class="col-6"><h6>Parse running Finnish text using <a href="http://turkunlp.org/Turku-neural-parser-pipeline/">TurkuNLP\'s TNPP</a>, and visualise with <a href="https://github.com/rug-compling/conllu-viewer">CoNLL-U viewer</a> from The University of Groningen</a></h6></div></div>'
