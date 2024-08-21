@@ -1,7 +1,7 @@
 ---
 state: present
 #instance_name: demo-prod
-std_image: Ubuntu-24.04
+std_image: Ubuntu-22.04
 flavor: standard.medium
 project_key: kielipouta
 network: project_2000680
