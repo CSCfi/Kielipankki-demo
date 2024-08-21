@@ -21,10 +21,6 @@
         flavor: standard.medium
         key_name: "{{ project_key }}"
         security_groups: "{{ project_security_groups }}"
-        # network: public
-        # access_ipv4: 86.50.169.164
-        # auto_ip: false
-        # floating_ip: 86.50.169.164
         meta:
           hostname: "{{ pouta_instance_name }}"
           group: "{{ instance_name }}"
@@ -50,8 +46,20 @@
         protocol: tcp
         port: 80
         allowed_ips:
-          - "195.148.30.109/32" #Kielipankki-proxy-pre-prod
-          - "195.148.30.210/32" #Kielipankki-proxy-prod
+          - "0.0.0.0/0"
+
+      - name: https
+        protocol: tcp
+        port: 443
+        allowed_ips:
+          - "0.0.0.0/0"
+
+      # - name: http
+      #   protocol: tcp
+      #   port: 80
+      #   allowed_ips:
+      #     - "195.148.30.109/32" #Kielipankki-proxy-pre-prod
+      #     - "195.148.30.210/32" #Kielipankki-proxy-prod
 
     authorized_users:
       - ktegel
