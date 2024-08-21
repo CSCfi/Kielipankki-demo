@@ -1,0 +1,2 @@
+#!/bin/bash
+finnish-nertag --show-analyses | cut -f1,2,3,5
