@@ -1,0 +1,30 @@
+---
+- name: Write host file
+  become: true
+  ansible.builtin.template:
+    src: templates/host.txt.j2
+    dest: "/var/www/cgi-bin/host.txt"
+    owner: www-data
+    group: www-data
+
+- name: Copy cgi-bin contents
+  become: true
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/cgi-bin/"
+    dest: /var/www/cgi-bin
+
+- name: Copy conllu-viewer UI dependencies
+  become: true
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "{{ item }}"
+    dest: "/var/www/conllu/"
+  loop:
+    - "/home/{{ ansible_user }}/conllu-viewer/jquery.js"
+    - "/home/{{ ansible_user }}/conllu-viewer/tooltip.js"
+    - "/home/{{ ansible_user }}/conllu-viewer/tooltip.css"

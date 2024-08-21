@@ -1,0 +1,11 @@
+---
+- name: Read site content
+  ansible.builtin.include_vars: index_vars.yaml
+
+- name: Install index.html
+  become: true
+  ansible.builtin.template:
+    src: templates/index.html.j2
+    dest: /var/www/index.html
+    owner: www-data
+    group: www-data

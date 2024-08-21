@@ -5,7 +5,15 @@
 
 - name: Setup demo endpoint
   hosts: kielipankki-demo-vm
+  become: true
   roles:
+    - demo-setup
 #    - lighttpd
 #    - firewall
 #    - cgi-bin
+
+- name: Build content
+  hosts: kielipankki-demo-vm
+  roles:
+    - html
+    - cgi-bin

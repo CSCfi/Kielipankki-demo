@@ -1,0 +1,61 @@
+server.modules = (
+        "mod_setenv",
+	"mod_access",
+	"mod_alias",
+	"mod_deflate",
+ 	"mod_redirect",
+	"mod_auth",
+	"mod_authn_file",
+        "mod_accesslog",
+        "mod_setenv"
+)
+
+server.modules += ( "mod_cgi" )
+$HTTP["url"] =~ "^/cgi-bin/" {
+	cgi.assign = ( "" => "" )
+}
+
+# include "/etc/lighttpd/conf-enabled/*.conf"
+
+$HTTP["url"] =~ "^/files($|/)" { server.dir-listing = "enable" }
+$HTTP["url"] =~ "^/download($|/)" { server.dir-listing = "enable" }
+
+server.document-root        = "/var/www"
+server.upload-dirs          = ( "/var/cache/lighttpd/uploads" )
+server.errorlog             = "/var/log/lighttpd/error.log"
+server.pid-file             = "/var/run/lighttpd.pid"
+server.username             = "www-data"
+server.groupname            = "www-data"
+server.port                 = 80
+accesslog.filename          = "/var/log/lighttpd/access.log"
+
+index-file.names            = ( "index.html" )
+url.access-deny             = ( "~", ".inc" )
+static-file.exclude-extensions = ( ".php", ".pl", ".fcgi" )
+
+auth.backend = "plain"
+auth.backend.plain.userfile = "/var/www/anee_user_auth.txt"
+auth.require = ( "/cgi-bin/upload_gexf_admin.py" =>
+        (
+                "method" => "basic",
+                "realm" => "ANEE admin",
+                "require" => "valid-user" 
+        )
+)
+
+deflate.cache-dir           = "/var/cache/lighttpd/compress/"
+deflate.mimetypes           = ( "application/javascript", "text/css", "text/html", "text/plain" )
+
+# default listening port for IPv6 falls back to the IPv4 port
+## Use ipv6 if available
+#include_shell "/usr/share/lighttpd/use-ipv6.pl " + server.port
+include_shell "/usr/share/lighttpd/create-mime.conf.pl"
+
+setenv.add-response-header = ( "Access-Control-Allow-Origin" => "*" )
+
+# blocks
+{% for ip in ip_block_list %}
+$HTTP["remoteip"] == "{{ ip }}" {
+       url.access-deny = ( "" )
+  }
+{% endfor %}
