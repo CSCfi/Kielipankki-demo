@@ -118,7 +118,7 @@ def print_content():
         inputval = text_from_file(form["file"])
     if inputval != "":
         #        nertagger = form["lang"].value
-        process = Popen([wrkdir + "/run-nertag"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        process = Popen("run-nertag"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate(input=inputval)
         session_key = hashlib.md5(out).hexdigest()
         out_rows = tsv2rows(
@@ -130,14 +130,14 @@ def print_content():
         rewrite_finer_to_bio(out_rows)
         tokens = " ".join(extract_column(out_rows, 0))
         process = Popen(
-            [wrkdir + "/run-hisner-prs-loc"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+            ["run-histner-prs-loc"], stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
         out, err = process.communicate(input=tokens.encode("utf-8"))
         hisner_prs_loc_tags = map(
             rewrite_bio, extract_column(tsv2rows(out.decode("utf-8")), 1)
         )
         process = Popen(
-            [wrkdir + "/run-hisner-org"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+            ["run-hisner-org"], stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
         out, err = process.communicate(input=tokens.encode("utf-8"))
         hisner_org_tags = map(
