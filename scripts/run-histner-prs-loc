@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -cp /usr/local/bin/share/histner/stanford-ner.jar edu.stanford.nlp.ie.crf.CRFClassifier -loadClassifier /usr/local/bin/share/histner/hist-model-loc-prs.ser.gz -encoding utf-8 -readStdin -tokenizerFactory edu.stanford.nlp.process.WhitespaceTokenizer -tokenizerOptions "tokenizeNLs=true" -outputFormat "tsv"
+java -cp /usr/local/share/histner/stanford-ner.jar edu.stanford.nlp.ie.crf.CRFClassifier -loadClassifier /usr/local/share/histner/hist-model-loc-prs.ser.gz -encoding utf-8 -readStdin -tokenizerFactory edu.stanford.nlp.process.WhitespaceTokenizer -tokenizerOptions "tokenizeNLs=true" -outputFormat "tsv"
