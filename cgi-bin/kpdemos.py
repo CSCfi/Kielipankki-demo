@@ -421,7 +421,7 @@ def write_excel(rows, filename, title):
             ws.append(row)
     for column_cells in ws.columns:
         length = min(max(len(str(cell.value)) for cell in column_cells), 20)
-        ws.column_dimensions[column_cells[0].column].width = length + 3
+        ws.column_dimensions[column_cells[0].column_letter].width = length + 3
     wb.save(tmpdir + "/" + filename + ".xlsx")
 
 
