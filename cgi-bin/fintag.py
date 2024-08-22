@@ -139,7 +139,7 @@ def print_content():
             rewrite_bio, extract_column(tsv2rows(out.decode("utf-8")), 1)
         )
         process = Popen(
-            ["/usr/local/bin/run-hisner-org"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+            ["/usr/local/bin/run-histner-org"], stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
         out, err = process.communicate(input=tokens.encode("utf-8"))
         hisner_org_tags = map(
