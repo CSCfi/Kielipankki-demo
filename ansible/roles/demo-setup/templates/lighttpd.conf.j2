@@ -23,6 +23,7 @@ $HTTP["url"] =~ "^/download($|/)" { server.dir-listing = "enable" }
 server.document-root        = "/var/www"
 server.upload-dirs          = ( "/var/cache/lighttpd/uploads" )
 server.errorlog             = "/var/log/lighttpd/error.log"
+server.breakagelog          = "/var/log/lighttpd/cgi_err.log"
 server.pid-file             = "/var/run/lighttpd.pid"
 server.username             = "www-data"
 server.groupname            = "www-data"
