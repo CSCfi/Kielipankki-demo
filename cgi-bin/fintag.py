@@ -118,7 +118,7 @@ def print_content():
         inputval = text_from_file(form["file"])
     if inputval != "":
         #        nertagger = form["lang"].value
-        process = Popen("run-nertag"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        process = Popen("run-nertag"), stdin=PIPE, stdout=PIPE, stderr=PIPE)
         out, err = process.communicate(input=inputval)
         session_key = hashlib.md5(out).hexdigest()
         out_rows = tsv2rows(
