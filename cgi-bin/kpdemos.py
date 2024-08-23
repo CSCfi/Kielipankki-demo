@@ -191,7 +191,9 @@ def pad_rows(rows, upto=None, pad_with=""):
     else:
         maxlen = upto
     return [
-        row if len(row) >= maxlen else row + ((maxlen - len(row)) * [pad_with])
+        list(row)
+        if len(row) >= maxlen
+        else list(row) + ((maxlen - len(row)) * [pad_with])
         for row in rows
     ]
 
