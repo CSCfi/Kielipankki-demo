@@ -155,5 +155,26 @@
     remote_src: true
     src: "/home/{{ ansible_user }}/Kielipankki-demo/scripts/"
     dest: /usr/local/bin
+- name: Build and install ofitwol
+  ansible.builtin.command:
+    chdir: "{{ item.dir }}"
+    cmd: "{{ item.cmd }}"
+  loop:
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/rules"
+      cmd: make
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: make ofitwol.ofst
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: "cp ofitwol.ofst /usr/local/share/ofitwol/"
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: make ofimphon.ofst
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: "cp ofimphon.ofst /usr/local/share/ofitwol/"
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: make ofiguess.ofst
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: "cp ofiguess.ofst /usr/local/share/ofitwol/"
+
+
 
 
