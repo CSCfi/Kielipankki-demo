@@ -55,10 +55,10 @@
       ansible.builtin.template:
         src: templates/lighttpd.conf.j2
         dest: /etc/lighttpd/lighttpd.conf
-    - name: Reload lighttpd
+    - name: Restart lighttpd
       ansible.builtin.systemd_service:
         name: lighttpd.service
-        state: reloaded
+        state: restarted
 
 - name: Ensure directories
   ansible.builtin.file:
