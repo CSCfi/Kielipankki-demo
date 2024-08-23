@@ -109,15 +109,10 @@
 - name: Unpack histner
   ansible.builtin.unarchive:
     remote_src: yes
-    dest: "/home/{{ ansible_user }}/histner/"
+    dest: "/usr/local/share/histner/"
     src: "/home/{{ ansible_user }}/Kielipankki-demo/files/histner.tar.gz"
+    creates: "/usr/local/share/histner/hist-model-loc-prs.ser.gz"
 
-- name: Install histner
-  ansible.builtin.copy:
-    remote_src: yes
-    src: "/home/{{ ansible_user }}/histner/"
-    dest: /usr/local/share
-    
 - name: Build word embeddings library
   ansible.builtin.command:
     chdir: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/"
