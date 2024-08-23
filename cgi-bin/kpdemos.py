@@ -437,6 +437,34 @@ def write_docx(txt, session_key, title):
     document.save(tmpdir + "/" + session_key + ".docx")
 
 
+import string
+
+
+def naive_tokenize(line):
+    retval = []
+    if line == "":
+        return retval
+    parts = line.split()
+    for part in parts:
+        thispart = part
+        while thispart != "" and thispart[0] in string.punctuation:
+            retval.append(thispart[0])
+            thispart = thispart[1:]
+        endpunct_queue = []
+        while thispart != "" and thispart[-1] in string.punctuation:
+            if thispart.endswith("..."):
+                endpunct_queue.append("...")
+                thispart = thispart[:-3]
+            else:
+                endpunct_queue.append(thispart[-1])
+                thispart = thispart[:-1]
+        if thispart != "":
+            retval.append(thispart)
+        for endpunct in endpunct_queue[::-1]:
+            retval.append(endpunct)
+    return retval
+
+
 kielipankki_texttools_api_url = "http://kielipankki.rahtiapp.fi/text/fi"
 import requests
 import json
