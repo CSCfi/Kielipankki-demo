@@ -68,7 +68,7 @@ def print_content():
         ]
         for word in inputwords:
             analysis_out = analyser.lookup(word)
-            mphon_out = mhon.lookup(word)
+            mphon_out = mphon.lookup(word)
             guesser_out = guesser.lookup(word)
             maxlen = max(len(analysis_out), len(mphon_out), len(guesser_out))
             out_rows.append([word, "", "", ""])
