@@ -34,7 +34,12 @@ document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syysk
 # }
 # '''
 
-column_names = ["Token", "Analysis"]
+column_names = [
+    "Token",
+    "Morphological analysis",
+    "Morphohonemic analysis",
+    "Morphohonemic guesser",
+]
 
 
 def print_content():
@@ -58,14 +63,7 @@ def print_content():
         session_key = hashlib.md5(("ofitwol" + inputval).encode("utf-8")).hexdigest()
         # locationvectorvector = pmatcher.locate(inputval)
         inputwords = naive_tokenize(inputval)
-        out_rows = [
-            [
-                "Input",
-                "Morphological analysis",
-                "Morphophonemic analysis",
-                "Morphohonemic guesser",
-            ]
-        ]
+        out_rows = []
         for word in inputwords:
             analysis_out = analyser.lookup(word)
             mphon_out = mphon.lookup(word)
