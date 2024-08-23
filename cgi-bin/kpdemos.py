@@ -18,7 +18,9 @@ kp_hostname = "https://kielipankki.fi"
 sitedir = "/var/www"
 wrkdir = sitedir + "/kielipankki-tools"
 tmpdir = sitedir + "/tmp"
-path_to_tagtools = "/usr/local/bin/"
+sharedir = "/usr/local/share"
+path_to_tagtools = "/usr/local/bin"
+logdir = "/var/log/kielipankki-tools"
 
 kpdemos_header = """
 <header>
@@ -47,7 +49,7 @@ def log(message):
     if logfilename == "":
         logfilename = "misc.log"
     localtime = time.localtime()
-    path = os.path.join(wrkdir, "log", logfilename)
+    path = os.path.join(logdir, logfilename)
     timestring = "{year}-{month}-{day} {hour}:{minute}:{second}".format(
         year=localtime.tm_year,
         month=localtime.tm_mon,
@@ -67,7 +69,7 @@ def log(message):
 
 def tokenize(text):
     process = Popen(
-        [path_to_tagtools + "finnish-tokenize"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+        [path_to_tagtools + "/finnish-tokenize"], stdin=PIPE, stdout=PIPE, stderr=PIPE
     )
     out, err = process.communicate(input=text.replace("\n", "\n\n").encode("utf-8"))
     out_utf8 = out[:-1].decode("utf-8")

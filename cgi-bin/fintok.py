@@ -45,26 +45,35 @@ def print_content():
     if "file" in form and form["file"].filename != "":
         inputval = text_from_file(form["file"])
     if inputval != "":
-        process = Popen([path_to_tagtools + "finnish-tokenize"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        process = Popen(
+            [path_to_tagtools + "/finnish-tokenize"],
+            stdin=PIPE,
+            stdout=PIPE,
+            stderr=PIPE,
+        )
         out, err = process.communicate(input=inputval)
         session_key = hashlib.md5(out).hexdigest()
         out_utf8 = out.decode("utf-8")[:-2]
         out_rows = tsv2rows(out_utf8)
         write_excel(out_rows, session_key, "Output from fintok")
         write_txt(out_utf8, session_key)
-        result += "<p>Result: {} tokens, {} sentences</p>\n".format(len(out_rows), len(list(filter(lambda x: x[0] == "", out_rows))))
-        result += '''
+        result += "<p>Result: {} tokens, {} sentences</p>\n".format(
+            len(out_rows), len(list(filter(lambda x: x[0] == "", out_rows)))
+        )
+        result += """
         <div class="row">
         <div class="col-md-auto">
         <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.txt" download="tokenized.txt" role="button">Download text</a>
         <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="tokenized.xlsx" role="button">Download Excel spreadsheet</a>
         </div>
         </div>
-        '''.format(html_root = hostname, filename = session_key)
-        result += make_table(out_rows, header = column_names) + "\n"
+        """.format(
+            html_root=hostname, filename=session_key
+        )
+        result += make_table(out_rows, header=column_names) + "\n"
     body = wrap_in_tags("finnish-tokenize demo", "h2")
-    body += '<h6>Split running text into tokens.</h6>'
-    body += '''
+    body += "<h6>Split running text into tokens.</h6>"
+    body += """
 <a href="#help" data-toggle="collapse">Show help</a>
 <div class="collapse" id="help">
   <div class="card" style="width: 40rem;">
