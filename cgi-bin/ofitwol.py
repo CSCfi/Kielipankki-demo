@@ -49,37 +49,74 @@ def print_content():
     if inputval != "":
         inputval = inputval.decode("utf-8").lower()
         log("got input " + inputval)
-        pmatcher = hfst.PmatchContainer("ofitwol.hfst")
-        log("loaded pmatch")
+        # pmatcher = hfst.PmatchContainer("ofitwol.hfst")
+        analyser = hfst.HfstInputStream(sharedir + "/ofitwol/ofitwol.ofst").read()
+        mphon = hfst.HfstInputStream(sharedir + "/ofitwol/ofimphon.ofst").read()
+        guesser = hfst.HfstInputStream(sharedir + "/ofitwol/ofiguess.ofst").read()
         session_key = hashlib.md5(("ofitwol" + inputval).encode("utf-8")).hexdigest()
-        locationvectorvector = pmatcher.locate(inputval)
-        log("ran pmatch")
-        out_rows = []
-        out_utf8 = ""
-        for locationvector in locationvectorvector:
-            if locationvector[0].output == '@_NONMATCHING_@':
-                continue
-            out_rows.append([locationvector[0].input, locationvector[0].output])
-            out_utf8 += locationvector[0].input + '\t' + locationvector[0].output + '\n'
-        excel_download_button_string = '<a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="ofitwol.xlsx" role="button">Download Excel spreadsheet</a>'.format(html_root = hostname, filename = session_key)
+        # locationvectorvector = pmatcher.locate(inputval)
+        inputwords = naive_tokenize(inputval)
+        out_rows = [
+            [
+                "Input",
+                "Morphological analysis",
+                "Morphophonemic analysis",
+                "Morphohonemic guesser",
+            ]
+        ]
+        for word in inputwords:
+            analysis_out = analyser.lookup(word)
+            mphon_out = mhon.lookup(word)
+            guesser_out = guesser.lookup(word)
+            maxlen = max(len(analysis_out), len(mphon_out), len(guesser_out))
+            out_rows.append([word, "", "", ""])
+            word_rows = []
+            for i in range(maxlen):
+                this_row = []
+                if len(analysis_out) > i:
+                    this_row.append(analysis_out[i][0])
+                else:
+                    this_row.append("")
+                if len(mphon_out) > i:
+                    this_row.append(mphon_out[i][0])
+                else:
+                    this_row.append("")
+                if len(guesser_out) > i:
+                    this_row.append(guesser_out[i][0] + " " + str(guesser_out[i][1]))
+                else:
+                    this_row.append("")
+        out_utf8 = "\n".join(["\t".join([word for word in row]) for row in out_rows])
+
+        # for locationvector in locationvectorvector:
+        #     if locationvector[0].output == "@_NONMATCHING_@":
+        #         continue
+        #     out_rows.append([locationvector[0].input, locationvector[0].output])
+        #     out_utf8 += locationvector[0].input + "\t" + locationvector[0].output + "\n"
+        excel_download_button_string = '<a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="ofitwol.xlsx" role="button">Download Excel spreadsheet</a>'.format(
+            html_root=hostname, filename=session_key
+        )
         try:
             write_excel(out_rows, session_key, "Output from fintok")
         except Exception as ex:
             excel_download_button_string = '<a class="btn btn-info" role="button">Writing Excel spreadsheet failed!</a>'
         write_txt(out_utf8, session_key)
         # result += "<p>Result: {} tokens, {} sentences</p>\n".format(len(out_rows), len(list(filter(lambda x: x[0] == "", out_rows))))
-        result += '''
+        result += """
         <div class="row">
         <div class="col-md-auto">
         <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.txt" download="tokenized.txt" role="button">Download text</a>
         {excel_button_text}
         </div>
         </div>
-        '''.format(html_root = hostname, filename = session_key, excel_button_text = excel_download_button_string)
-        result += make_table(out_rows, header = column_names) + "\n"
+        """.format(
+            html_root=hostname,
+            filename=session_key,
+            excel_button_text=excel_download_button_string,
+        )
+        result += make_table(out_rows, header=column_names) + "\n"
     body = wrap_in_tags("ofitwol demo", "h2")
     body += '<h6>Analyze with <a href="https://pytwolc.readthedocs.io/en/latest/ofitwol.html">OFITWOL</a></h6>'
-    body += '''
+    body += """
 <a href="#help" data-toggle="collapse">Show help</a>
 <div class="collapse" id="help">
   <div class="card" style="width: 40rem;">
