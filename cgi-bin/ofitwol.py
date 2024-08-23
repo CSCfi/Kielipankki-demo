@@ -19,21 +19,6 @@ document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syysk
 }
 """
 
-# download_js = '''
-# function download(filename, text) {
-#   var element = document.createElement('a');
-#   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-#   element.setAttribute('download', filename);
-
-#   element.style.display = 'none';
-#   document.body.appendChild(element);
-
-#   element.click();
-
-#   document.body.removeChild(element);
-# }
-# '''
-
 column_names = [
     "Token",
     "Morphological analysis",
@@ -56,12 +41,10 @@ def print_content():
     if inputval != "":
         inputval = inputval.decode("utf-8").lower()
         log("got input " + inputval)
-        # pmatcher = hfst.PmatchContainer("ofitwol.hfst")
         analyser = hfst.HfstInputStream(sharedir + "/ofitwol/ofitwol.ofst").read()
         mphon = hfst.HfstInputStream(sharedir + "/ofitwol/ofimphon.ofst").read()
         guesser = hfst.HfstInputStream(sharedir + "/ofitwol/ofiguess.ofst").read()
         session_key = hashlib.md5(("ofitwol" + inputval).encode("utf-8")).hexdigest()
-        # locationvectorvector = pmatcher.locate(inputval)
         inputwords = naive_tokenize(inputval, lower=True)
         out_rows = []
         for word in inputwords:
@@ -88,11 +71,6 @@ def print_content():
 
         out_utf8 = "\n".join(["\t".join([word for word in row]) for row in out_rows])
 
-        # for locationvector in locationvectorvector:
-        #     if locationvector[0].output == "@_NONMATCHING_@":
-        #         continue
-        #     out_rows.append([locationvector[0].input, locationvector[0].output])
-        #     out_utf8 += locationvector[0].input + "\t" + locationvector[0].output + "\n"
         excel_download_button_string = '<a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="ofitwol.xlsx" role="button">Download Excel spreadsheet</a>'.format(
             html_root=hostname, filename=session_key
         )
@@ -101,7 +79,6 @@ def print_content():
         except Exception as ex:
             excel_download_button_string = '<a class="btn btn-info" role="button">Writing Excel spreadsheet failed!</a>'
         write_txt(out_utf8, session_key)
-        # result += "<p>Result: {} tokens, {} sentences</p>\n".format(len(out_rows), len(list(filter(lambda x: x[0] == "", out_rows))))
         result += """
         <div class="row">
         <div class="col-md-auto">
