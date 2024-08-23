@@ -442,10 +442,12 @@ def write_docx(txt, session_key, title):
 import string
 
 
-def naive_tokenize(line):
+def naive_tokenize(line, lowercase=False):
     retval = []
     if line == "":
         return retval
+    if lowercase:
+        line = line.lower()
     parts = line.split()
     for part in parts:
         thispart = part

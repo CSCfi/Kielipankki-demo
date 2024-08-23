@@ -62,7 +62,7 @@ def print_content():
         guesser = hfst.HfstInputStream(sharedir + "/ofitwol/ofiguess.ofst").read()
         session_key = hashlib.md5(("ofitwol" + inputval).encode("utf-8")).hexdigest()
         # locationvectorvector = pmatcher.locate(inputval)
-        inputwords = naive_tokenize(inputval)
+        inputwords = naive_tokenize(inputval, lower=True)
         out_rows = []
         for word in inputwords:
             analysis_out = analyser.lookup(word)
