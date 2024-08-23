@@ -72,9 +72,8 @@ def print_content():
             guesser_out = guesser.lookup(word)
             maxlen = max(len(analysis_out), len(mphon_out), len(guesser_out))
             out_rows.append([word, "", "", ""])
-            word_rows = []
             for i in range(maxlen):
-                this_row = []
+                this_row = [""]
                 if len(analysis_out) > i:
                     this_row.append(analysis_out[i][0])
                 else:
@@ -87,6 +86,8 @@ def print_content():
                     this_row.append(guesser_out[i][0] + " " + str(guesser_out[i][1]))
                 else:
                     this_row.append("")
+                out_rows.append(this_row)
+
         out_utf8 = "\n".join(["\t".join([word for word in row]) for row in out_rows])
 
         # for locationvector in locationvectorvector:
