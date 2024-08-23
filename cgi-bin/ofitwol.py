@@ -37,8 +37,8 @@ document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syysk
 column_names = [
     "Token",
     "Morphological analysis",
-    "Morphohonemic analysis",
-    "Morphohonemic guesser",
+    "Morphophonemic analysis",
+    "Morphophonemic guesser",
 ]
 
 
@@ -130,8 +130,7 @@ def print_content():
       <p class="card-text">Because OFITWOL is limited to lower-case letters, the input is converted to lowercase before analysis.</p>
       <h6 class="card-subtitle lead">Understanding output</h6>
       <p class="card-text">
-        The output is presented as one line per token, with content (eg. punctuation) not recognised by OFITWOL suppressed.</p>
-      <p class="card-text">OFITWOL implements a morphophonemic analyser (ofimphon) and a guesser (ofiguess). If ofimphon knows a word, its output (the one with lowest weight, if multiple) is reported, otherwise the output of ofiguess (again, with lowest weight) is reported.</p>
+        The output is presented as one line per input token, and full cohort output from each of the three ofitwol analysers: morphological, morphohonemic, and morphophonemic guesser (with weights displayed, smaller is more likely).</p>
       <p class="card-text">Output may also be downloaded as text or a spreadsheet.</p>
       </p>
     </div>
