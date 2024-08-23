@@ -79,23 +79,20 @@
     recurse: true
     path: /var/www
 
-- name: Fetch tools repo
+- name: Fetch git repos
   become_user: "{{ ansible_user }}"
   ansible.builtin.git:
-    repo: https://github.com/CSCfi/Kielipankki-demo.git
-    dest: "/home/{{ ansible_user }}/Kielipankki-demo"
-
-- name: Fetch conllu-viewer repo
-  become_user: "{{ ansible_user }}"
-  ansible.builtin.git:
-    repo: https://github.com/CSCfi/Kielipankki-conllu-viewer.git
-    dest: "/home/{{ ansible_user }}/conllu-viewer"
-
-- name: Fetch nlp-tools repo
-  become_user: "{{ ansible_user }}"
-  ansible.builtin.git:
-    repo: https://github.com/Traubert/nlp-tools.git
-    dest: "/home/{{ ansible_user }}/nlp-tools"
+    repo: "{{ item.repo }}"
+    dest: "/home/{{ ansible_user }}/{{ item.dir }}"
+  loop:
+    - dir: ofitwol
+      repo: https://github.com/CSCfi/Kielipankki-ofitwol.git
+    - dir: Kielipankki-demo
+      repo: https://github.com/CSCfi/Kielipankki-demo.git
+    - dir: conllu-viewer
+      repo: https://github.com/CSCfi/Kielipankki-conllu-viewer.git
+    - dir: nlp-tools
+      repo: https://github.com/Traubert/nlp-tools.git
 
 - name: Fetch software releases
   ansible.builtin.unarchive:
