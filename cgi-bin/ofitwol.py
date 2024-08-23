@@ -8,15 +8,16 @@ import hashlib
 import os
 import cgitb
 import hfst
+
 cgitb.enable()
 
 from kpdemos import *
 
-populate_js = '''
+populate_js = """
 function populateTextField() {
 document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syyskuuta 1900 Pielavesi – 31. elokuuta 1986 Helsinki) oli suomalainen poliitikko ja kahdeksas Suomen tasavallan presidentti. Hän oli tasavallan istuva presidentti yhtäjaksoisesti vuodesta 1956 alkuvuoteen 1982, yli 25 vuoden ajan. Viimeinen presidenttikausi jäi kesken sairauden takia. Kekkonen on Suomen historian pitkäaikaisin presidentti. Hän on ensimmäinen henkilö, joka toimi tasavallan presidenttinä kaksi kokonaista kautta ja ainoa, joka on valittu toimeensa useammaksi kuin kahdeksi kaudeksi, mikä ei perustuslakiin eli entiseen Suomen hallitusmuotoon myöhemmin tehdyn muutoksen ja nykyisen Suomen perustuslain mukaan olisi enää mahdollistakaan. Ennen presidenttiyttään Kekkonen toimi muun muassa juristina, yleisurheilijana, oikeusministerinä, eduskunnan puhemiehenä sekä viiden hallituksen pääministerinä. Presidentin valitsijamiehenä, kansanedustajana ja ministerinä Kekkonen oli valitsemassa Kyösti Kalliota vuonna 1937, Risto Rytiä vuosina 1940 ja 1943, Gustaf Mannerheimia vuonna 1944 sekä J. K. Paasikiveä vuonna 1946.";
 }
-'''
+"""
 
 # download_js = '''
 # function download(filename, text) {
@@ -34,6 +35,7 @@ document.getElementById("inputted_text").value = "Urho Kaleva Kekkonen (3. syysk
 # '''
 
 column_names = ["Token", "Analysis"]
+
 
 def print_content():
     log("starting")
@@ -136,8 +138,8 @@ def print_content():
     </div>
   </div>
 </div>
-'''
-    body += '''
+"""
+    body += """
 <form method="post" action="/cgi-bin/{scriptname}" enctype="multipart/form-data">
   <div class="form-group">
     <div class="row">
@@ -172,9 +174,19 @@ def print_content():
     <p><small>Page generated in {TIME_SPENT:.2f} seconds</small></p>
   </div>
 </div>
-'''.format(scriptname = os.path.basename(sys.argv[0]), content = result, TIME_SPENT = time.time() - time_start)
+""".format(
+        scriptname=os.path.basename(sys.argv[0]),
+        content=result,
+        TIME_SPENT=time.time() - time_start,
+    )
 
-    sys.stdout.buffer.write(wrap_html(make_head(title = 'fintok demo', scripts = (populate_js,)), wrap_in_tags(body, 'div', attribs='class="container pt-1"', oneline = False)).encode("utf-8"))
+    sys.stdout.buffer.write(
+        wrap_html(
+            make_head(title="fintok demo", scripts=(populate_js,)),
+            wrap_in_tags(body, "div", attribs='class="container pt-1"', oneline=False),
+        ).encode("utf-8")
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print_content()
