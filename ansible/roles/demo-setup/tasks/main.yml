@@ -112,6 +112,14 @@
     - url: https://korp.csc.fi/download/finnish-tagtools/v1.6/finnish-tagtools-1.6.0.zip
       creates: "/home/{{ ansible_user }}/finnish-tagtools-1.6.0"
 
+- name: Fetch and unpack sentiment classifier package
+  become_user: www-data
+  ansible.builtin.unarchive:
+    remote_src: yes
+    dest: "/usr/share/predict/"
+    src: https://a3s.fi/demo_server_blobs/predict.tar.xz
+    creates: "/usr/share/predict/snapshot/"
+
 - name: Unpack histner
   ansible.builtin.unarchive:
     remote_src: yes
