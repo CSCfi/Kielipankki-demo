@@ -142,14 +142,9 @@
       ./configure --with-unicode-handler=glib 
       --without-sfst 
       --without-foma 
-      --enable-no-tools 
-      --enable-lookup 
-      --enable-tokenize 
-      --enable-pmatch 
-      --enable-optimized-lookup 
-      --disable-dependency-tracking
     - "make -j 4"
     - "make install-strip"
+    - ldconfig
 
 - name: Build HFST's Python bindings
   ansible.builtin.command:
