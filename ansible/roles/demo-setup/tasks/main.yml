@@ -47,6 +47,7 @@
     name:
       - torch
       - textract
+      - twol # for ofitwol
 
 - name: Configure lighttpd block
   block:
