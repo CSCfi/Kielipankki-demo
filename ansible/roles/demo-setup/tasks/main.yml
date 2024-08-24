@@ -104,10 +104,13 @@
   ansible.builtin.unarchive:
     remote_src: yes
     dest: "/home/{{ ansible_user }}/"
-    src: "{{ item }}"
+    src: "{{ item.url }}"
+    creates: "{{ item.creates }}"
   loop:
-    - https://github.com/hfst/hfst/releases/download/v3.16.0/hfst-3.16.0.tar.bz2
-    - https://korp.csc.fi/download/finnish-tagtools/v1.6/finnish-tagtools-1.6.0.zip
+    - url: https://github.com/hfst/hfst/releases/download/v3.16.0/hfst-3.16.0.tar.bz2
+      creates: "/home/{{ ansible_user }}/hfst-3.16.0"
+    - url: https://korp.csc.fi/download/finnish-tagtools/v1.6/finnish-tagtools-1.6.0.zip
+      creates: "/home/{{ ansible_user }}/finnish-tagtools-1.6.0"
 
 - name: Unpack histner
   ansible.builtin.unarchive:
