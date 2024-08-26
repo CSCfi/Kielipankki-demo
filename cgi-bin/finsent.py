@@ -150,7 +150,7 @@ def print_content():
     </div>
   </div>
 </div>
-<form method="post" action="/cgi-bin/predict/{scriptname}" enctype="multipart/form-data">
+<form method="post" action="/cgi-bin/{scriptname}" enctype="multipart/form-data">
   <div class="form-group">
     <div class="row">
       <div class="col-md-auto">
