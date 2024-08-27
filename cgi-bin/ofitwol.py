@@ -45,12 +45,13 @@ def print_content():
         mphon = hfst.HfstInputStream(sharedir + "/ofitwol/ofimphon.ofst").read()
         guesser = hfst.HfstInputStream(sharedir + "/ofitwol/ofiguess.ofst").read()
         session_key = hashlib.md5(("ofitwol" + inputval).encode("utf-8")).hexdigest()
-        inputwords = naive_tokenize(inputval, lower=True)
+        inputwords = naive_tokenize(inputval)
         out_rows = []
         for word in inputwords:
-            analysis_out = analyser.lookup(word)
-            mphon_out = mphon.lookup(word)
-            guesser_out = guesser.lookup(word)
+            low_word = word.lower()
+            analysis_out = analyser.lookup(low_word)
+            mphon_out = mphon.lookup(low_word)
+            guesser_out = guesser.lookup(low_word)
             maxlen = max(len(analysis_out), len(mphon_out), len(guesser_out))
             out_rows.append([word, "", "", ""])
             for i in range(maxlen):
