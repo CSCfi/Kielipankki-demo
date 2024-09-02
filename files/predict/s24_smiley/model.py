@@ -16,9 +16,7 @@ class CNN_Text(nn.Module):
         self.args = args
         self.embs = embutils.WordEmbeddings()
         self.embs.load_from_file(
-            os.path.join(
-                os.path.dirname(__file__), "s24_smiley/s24_surfaces_normalized.bin"
-            )
+            os.path.join(os.path.dirname(__file__), "s24_surfaces_normalized.bin")
         )
         self.embedding_mismatches = set()
 
