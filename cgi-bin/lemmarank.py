@@ -9,6 +9,7 @@ import os
 import re
 import math
 import cgitb
+
 cgitb.enable()
 
 from kpdemos import *
@@ -27,23 +28,33 @@ from kpdemos import *
 # }}
 # '''.format(HOSTNAME=hostname)
 
+
 def escape_js_string(s):
-    return s.replace('"', '\\"').replace('\n', '\\n')
+    return s.replace('"', '\\"').replace("\n", "\\n")
 
-populate_js1 = '''
+
+populate_js1 = (
+    '''
 function populateTextField1() {
-document.getElementById("inputted_text").value = "''' + escape_js_string(open('../resources/perustuslaki.txt', encoding = 'utf-8').read()) + '''";
+document.getElementById("inputted_text").value = "'''
+    + escape_js_string(open("perustuslaki.txt", encoding="utf-8").read())
+    + """";
 }
-'''
+"""
+)
 
-populate_js2 = '''
+populate_js2 = (
+    '''
 function populateTextField2() {
-document.getElementById("inputted_text").value = "''' + escape_js_string(open('../resources/kekkonen.txt', encoding = 'utf-8').read()) + '''";
+document.getElementById("inputted_text").value = "'''
+    + escape_js_string(open("kekkonen.txt", encoding="utf-8").read())
+    + """";
 }
-'''
+"""
+)
 
-colors = ('red', 'orange', 'yellow', 'green', 'blue', 'purple', 'grey', 'rust')
-utils_js = '''
+colors = ("red", "orange", "yellow", "green", "blue", "purple", "grey", "rust")
+utils_js = """
 window.chartColors = {
 	red: 'rgb(255, 99, 132)',
 	orange: 'rgb(255, 159, 64)',
@@ -100,7 +111,7 @@ window.chartColors = {
 
 
 }(this));
-'''
+"""
 
 # download_js = '''
 # function download(filename, text) {
@@ -122,6 +133,7 @@ column_names = ["Nouns", "Verbs", "Adjectives", "NER entities"]
 n_words = 20
 max_gold_lemmas = 100000
 
+
 def process_input(inputval):
     result = ""
     try:
@@ -129,7 +141,7 @@ def process_input(inputval):
         out, err = process.communicate(input=inputval)
         session_key = hashlib.md5(out).hexdigest()
         out_rows = tsv2rows(out.decode("utf-8"))
-#        return(str(inputval))
+        #        return(str(inputval))
         surfaces = extract_column(out_rows, 0)
         lemmas = extract_column(out_rows, 1)
         tags = extract_column(out_rows, 2)
@@ -142,82 +154,150 @@ def process_input(inputval):
         adjectivedict = {}
         tokens = []
         for i in range(n_lemmas):
-            if nertags[i] == '':
+            if nertags[i] == "":
                 if len(this_nertag) > 0:
                     this_nertag.append(surfaces[i])
                 else:
-                    if '=NOUN' in tags[i]:
+                    if "=NOUN" in tags[i]:
                         noundict[lemmas[i]] = noundict.get(lemmas[i], 0) + 1
-                    elif '=VERB' in tags[i]:
+                    elif "=VERB" in tags[i]:
                         verbdict[lemmas[i]] = verbdict.get(lemmas[i], 0) + 1
-                    elif '=ADJECTIVE' in tags[i]:
+                    elif "=ADJECTIVE" in tags[i]:
                         adjectivedict[lemmas[i]] = adjectivedict.get(lemmas[i], 0) + 1
                     tokens.append(lemmas[i])
                 continue
-            if nertags[i].startswith('</') or nertags[i].endswith('/>'):
+            if nertags[i].startswith("</") or nertags[i].endswith("/>"):
                 lemma = lemmas[i]
                 surface = surfaces[i]
-                if 'PROPER' in tags[i]:
+                if "PROPER" in tags[i]:
                     if surface.isupper():
                         lemma = lemma.upper()
                     elif surface.istitle():
                         lemma = lemma.title()
                 this_nertag.append(lemma)
-#                ners.append([this_nertag, nertags[i][2:-1], i])
-                tagged = ' '.join(this_nertag)
+                #                ners.append([this_nertag, nertags[i][2:-1], i])
+                tagged = " ".join(this_nertag)
                 ner_dict[tagged] = ner_dict.get(tagged, 0) + 1
                 this_nertag = []
                 tokens.append(tagged)
             else:
-                if 'CASE=GEN' in tags[i] or 'CASE=NOM' in tags[i]:
+                if "CASE=GEN" in tags[i] or "CASE=NOM" in tags[i]:
                     this_nertag.append(surfaces[i])
                 else:
                     this_nertag.append(lemmas[i])
-                tokens.append('')
-        gold_worddict = dict(line.strip().split(" ") for line in open("lemmafreq.txt", encoding = "utf-8").readlines()[:max_gold_lemmas])
+                tokens.append("")
+        gold_worddict = dict(
+            line.strip().split(" ")
+            for line in open("lemmafreq.txt", encoding="utf-8").readlines()[
+                :max_gold_lemmas
+            ]
+        )
         nounfreqlist = []
         verbfreqlist = []
         adjectivefreqlist = []
-        for worddict, freqlist in ((noundict, nounfreqlist),
-                                   (verbdict, verbfreqlist),
-                                   (adjectivedict, adjectivefreqlist)):
+        for worddict, freqlist in (
+            (noundict, nounfreqlist),
+            (verbdict, verbfreqlist),
+            (adjectivedict, adjectivefreqlist),
+        ):
             for key, value in worddict.items():
                 if value == 1:
                     continue
-                freqlist.append((key, -1*math.log(float(value)/n_lemmas)))
-            freqlist.sort(key = lambda pair: pair[1])
+                freqlist.append((key, -1 * math.log(float(value) / n_lemmas)))
+            freqlist.sort(key=lambda pair: pair[1])
         nouns_in_gold_scored = []
         verbs_in_gold_scored = []
         adjectives_in_gold_scored = []
         words_not_in_gold = []
-        for words_in_gold_scored, freqlist in ((nouns_in_gold_scored, nounfreqlist),
-                                               (verbs_in_gold_scored, verbfreqlist),
-                                               (adjectives_in_gold_scored, adjectivefreqlist)):
+        for words_in_gold_scored, freqlist in (
+            (nouns_in_gold_scored, nounfreqlist),
+            (verbs_in_gold_scored, verbfreqlist),
+            (adjectives_in_gold_scored, adjectivefreqlist),
+        ):
             for word in freqlist:
                 if word[0] in gold_worddict:
-                    words_in_gold_scored.append((word[0], word[1] / float(gold_worddict[word[0]])))
+                    words_in_gold_scored.append(
+                        (word[0], word[1] / float(gold_worddict[word[0]]))
+                    )
                 else:
                     words_not_in_gold.append(word[0])
-            words_in_gold_scored.sort(key = second)
+            words_in_gold_scored.sort(key=second)
         nouns_in_gold = list(map(first, nouns_in_gold_scored))[:n_words]
         verbs_in_gold = list(map(first, verbs_in_gold_scored))[:n_words]
         adjectives_in_gold = list(map(first, adjectives_in_gold_scored))[:n_words]
-        ners_ = [pair[0] for pair in sorted(ner_dict.items(), reverse = True, key = lambda x: x[1])[:n_words]]
+        ners_ = [
+            pair[0]
+            for pair in sorted(ner_dict.items(), reverse=True, key=lambda x: x[1])[
+                :n_words
+            ]
+        ]
         words_not_in_gold = words_not_in_gold[:n_words]
-        ners_.sort(key = lambda x: ner_dict[x], reverse = True)
+        ners_.sort(key=lambda x: ner_dict[x], reverse=True)
         indexed_nouns_in_gold = list(zip(nouns_in_gold, range(len(nouns_in_gold))))
-        indexed_verbs_in_gold = list(zip(verbs_in_gold, map(lambda x: x + len(nouns_in_gold), range(len(verbs_in_gold)))))
-        indexed_adjectives_in_gold = list(zip(adjectives_in_gold, map(lambda x: x + len(nouns_in_gold) + len(verbs_in_gold), range(len(verbs_in_gold)))))
-        indexed_ners_ = list(zip(ners_, map(lambda x: x + len(nouns_in_gold) + len(verbs_in_gold) + len(adjectives_in_gold), range(len(ners_)))))
-        indexed_words_not_in_gold = list(zip(words_not_in_gold, map(lambda x: x + len(nouns_in_gold) + len(verbs_in_gold) + len(adjectives_in_gold) + len(ners_), range(len(words_not_in_gold)))))
-#        result_rows = cols2rows(words_in_gold, ners_, words_not_in_gold)
-        indexed_result_rows = cols2rows((indexed_nouns_in_gold, indexed_verbs_in_gold, indexed_adjectives_in_gold, indexed_ners_), pad_with = ('', None))
-#            write_excel([column_names] + result_rows, session_key, "Output from lemmarank")
-#            write_tsv(make_tsv([column_names] + result_rows), session_key)
+        indexed_verbs_in_gold = list(
+            zip(
+                verbs_in_gold,
+                map(lambda x: x + len(nouns_in_gold), range(len(verbs_in_gold))),
+            )
+        )
+        indexed_adjectives_in_gold = list(
+            zip(
+                adjectives_in_gold,
+                map(
+                    lambda x: x + len(nouns_in_gold) + len(verbs_in_gold),
+                    range(len(verbs_in_gold)),
+                ),
+            )
+        )
+        indexed_ners_ = list(
+            zip(
+                ners_,
+                map(
+                    lambda x: x
+                    + len(nouns_in_gold)
+                    + len(verbs_in_gold)
+                    + len(adjectives_in_gold),
+                    range(len(ners_)),
+                ),
+            )
+        )
+        indexed_words_not_in_gold = list(
+            zip(
+                words_not_in_gold,
+                map(
+                    lambda x: x
+                    + len(nouns_in_gold)
+                    + len(verbs_in_gold)
+                    + len(adjectives_in_gold)
+                    + len(ners_),
+                    range(len(words_not_in_gold)),
+                ),
+            )
+        )
+        #        result_rows = cols2rows(words_in_gold, ners_, words_not_in_gold)
+        indexed_result_rows = cols2rows(
+            (
+                indexed_nouns_in_gold,
+                indexed_verbs_in_gold,
+                indexed_adjectives_in_gold,
+                indexed_ners_,
+            ),
+            pad_with=("", None),
+        )
+    #            write_excel([column_names] + result_rows, session_key, "Output from lemmarank")
+    #            write_tsv(make_tsv([column_names] + result_rows), session_key)
     except Exception as ex:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        return "<p>Got exception " + str(ex) + " in file " + str(fname) + " line " + str(exc_tb.tb_lineno) + "</p>\n"
+        return (
+            "<p>Got exception "
+            + str(ex)
+            + " in file "
+            + str(fname)
+            + " line "
+            + str(exc_tb.tb_lineno)
+            + "</p>\n"
+        )
 
         # result += '''
         # <div class="row">
@@ -237,50 +317,93 @@ def process_input(inputval):
     all_datasets = []
     for j in range(5):
         for i in range(n_words):
-            wordlist = (nouns_in_gold, verbs_in_gold, adjectives_in_gold, ners_, words_not_in_gold)[j]
-            dataset = (noun_datasets, verb_datasets, adjective_datasets, ner_datasets, other_datasets)[j]
+            wordlist = (
+                nouns_in_gold,
+                verbs_in_gold,
+                adjectives_in_gold,
+                ners_,
+                words_not_in_gold,
+            )[j]
+            dataset = (
+                noun_datasets,
+                verb_datasets,
+                adjective_datasets,
+                ner_datasets,
+                other_datasets,
+            )[j]
             if i >= len(wordlist):
                 continue
             thisdata = "{ label: '" + wordlist[i] + "',\n"
-            thisdata += "backgroundColor: window.chartColors.{},\n".format(colors[len(all_datasets) % len(colors)])
-            thisdata += "borderColor: window.chartColors.{},\n".format(colors[len(all_datasets) % len(colors)])
+            thisdata += "backgroundColor: window.chartColors.{},\n".format(
+                colors[len(all_datasets) % len(colors)]
+            )
+            thisdata += "borderColor: window.chartColors.{},\n".format(
+                colors[len(all_datasets) % len(colors)]
+            )
             thisdata += "data: "
             counts = []
             for section in range(20):
-                counts.append(len(list(filter(lambda x: x == wordlist[i], tokens[int(section*0.05*len(tokens)):int((section+1)*0.05*len(tokens)) - 1]))))
+                counts.append(
+                    len(
+                        list(
+                            filter(
+                                lambda x: x == wordlist[i],
+                                tokens[
+                                    int(section * 0.05 * len(tokens)) : int(
+                                        (section + 1) * 0.05 * len(tokens)
+                                    )
+                                    - 1
+                                ],
+                            )
+                        )
+                    )
+                )
             thisdata += str(counts) + ",\n"
             thisdata += "fill: false\n}"
             dataset.append(thisdata)
             all_datasets.append(thisdata)
 
-    def my_make_table(rows, header = [], tdattribs = ""):
-        retval = ''.join(list(map(lambda x: wrap_in_tags(x, 'th'), header)))
+    def my_make_table(rows, header=[], tdattribs=""):
+        retval = "".join(list(map(lambda x: wrap_in_tags(x, "th"), header)))
         for row in rows:
             this_row = ""
             for item in row:
-#                if (item[1] != None):
-                this_row += wrap_in_tags(item[0], "td", attribs=tdattribs.format(CELL=str(item[1])))
-#                else:
-#                    this_row += wrap_in_tags(item[0], "td")
-            retval += wrap_in_tags(this_row, "tr", oneline = False)
-        return wrap_in_tags(retval, "table", oneline = False, attribs = 'class = table table-bordered')
+                #                if (item[1] != None):
+                this_row += wrap_in_tags(
+                    item[0], "td", attribs=tdattribs.format(CELL=str(item[1]))
+                )
+            #                else:
+            #                    this_row += wrap_in_tags(item[0], "td")
+            retval += wrap_in_tags(this_row, "tr", oneline=False)
+        return wrap_in_tags(
+            retval, "table", oneline=False, attribs="class = table table-bordered"
+        )
 
-        
-    table_code = wrap_in_tags(my_make_table(indexed_result_rows, header = column_names, tdattribs="onclick='show(\"{CELL}\")'" + ' id="cell_{CELL}"') + "\n", "div", attribs='class="col-md-auto"', oneline = False)
-    canvas_code = '''<div class="col-md-auto" width="100%">
+    table_code = wrap_in_tags(
+        my_make_table(
+            indexed_result_rows,
+            header=column_names,
+            tdattribs="onclick='show(\"{CELL}\")'" + ' id="cell_{CELL}"',
+        )
+        + "\n",
+        "div",
+        attribs='class="col-md-auto"',
+        oneline=False,
+    )
+    canvas_code = """<div class="col-md-auto" width="100%">
     <canvas id="lemmas_chart" width="720px"></canvas>
     </div>
-    '''
+    """
 
-    result += wrap_in_tags(canvas_code, 'div', attribs='class="row"', oneline = False)
-    result += wrap_in_tags(table_code, 'div', attribs='class="row"', oneline = False)
+    result += wrap_in_tags(canvas_code, "div", attribs='class="row"', oneline=False)
+    result += wrap_in_tags(table_code, "div", attribs='class="row"', oneline=False)
 
-    result += '''
+    result += """
     <script>
     alldatasets = [
-    '''
-    result += ', '.join(all_datasets) + ']\n\n'
-    result += '''
+    """
+    result += ", ".join(all_datasets) + "]\n\n"
+    result += """
     used_datasets = new Set();
     var config_lemmas = {
     type: 'line',
@@ -344,8 +467,9 @@ window.myLine = new Chart(ctx, config_lemmas);
     };
 
 </script>
-'''
+"""
     return result
+
 
 def print_content():
     time_start = time.time()
@@ -356,14 +480,14 @@ def print_content():
     if "input" in form:
         inputval = form["input"].value.encode("utf-8")
     if "file" in form and form["file"].filename != "":
-#        pass
-#        result += "Got file " + str(form["file"].filename)
+        #        pass
+        #        result += "Got file " + str(form["file"].filename)
         inputval = text_from_file(form["file"])
     if inputval != "":
         result += str(process_input(inputval))
 
     body = wrap_in_tags("lemmarank demo", "h2")
-    body += '''
+    body += """
 <h6>Rank representative lemmas and named entities from running text</h6>
 <a href="#help" data-toggle="collapse">Show help</a>
 <div class="collapse" id="help">
@@ -418,8 +542,20 @@ def print_content():
 </form>
 {content}
 <p><small>Page generated in {TIME_SPENT:.2f} seconds</small></p>
-'''.format(scriptname = os.path.basename(sys.argv[0]), content = result, TIME_SPENT = time.time() - time_start)
-    sys.stdout.buffer.write(wrap_html(make_head(title = 'lemmarank demo', scripts = (populate_js1, populate_js2, utils_js)), wrap_in_tags(body, 'div', attribs='class="container pt-1"')).encode("utf-8"))
+""".format(
+        scriptname=os.path.basename(sys.argv[0]),
+        content=result,
+        TIME_SPENT=time.time() - time_start,
+    )
+    sys.stdout.buffer.write(
+        wrap_html(
+            make_head(
+                title="lemmarank demo", scripts=(populate_js1, populate_js2, utils_js)
+            ),
+            wrap_in_tags(body, "div", attribs='class="container pt-1"'),
+        ).encode("utf-8")
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print_content()
