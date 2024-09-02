@@ -137,7 +137,9 @@ max_gold_lemmas = 100000
 def process_input(inputval):
     result = ""
     try:
-        process = Popen([wrkdir + "/run-nertag"], stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        process = Popen(
+            ["/usr/local/bin/run-nertag"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+        )
         out, err = process.communicate(input=inputval)
         session_key = hashlib.md5(out).hexdigest()
         out_rows = tsv2rows(out.decode("utf-8"))
