@@ -13,12 +13,14 @@ import textract
 first = lambda x: x[0]
 second = lambda x: x[1]
 
-hostname = "http://" + open("host.txt").read()
-kp_hostname = "https://kielipankki.fi"
+local_hostname = "http://" + open("host.txt").read()
+kp_hostname = "https://kielipankki.fi/tools/demo"
+hostname = local_hostname
 sitedir = "/var/www"
 wrkdir = sitedir + "/kielipankki-tools"
 tmpdir = sitedir + "/tmp"
 sharedir = "/usr/local/share"
+vector_dir = sharedir + "/vecs"
 path_to_tagtools = "/usr/local/bin"
 logdir = "/var/log/kielipankki-tools"
 
