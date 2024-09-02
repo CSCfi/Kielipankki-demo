@@ -12,9 +12,7 @@ cgitb.enable()
 import string
 import hashlib
 
-wrkdir = "/var/www/kielipankki-tools"
-
-sys.path.append("/usr/local/share/predict")
+sys.path.append("/usr/local/share/predict/")
 from kpdemos import *
 
 
