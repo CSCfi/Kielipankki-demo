@@ -24,7 +24,7 @@ categories:
   - title: "Tekstianalyysi"
     items:
       - title: "FinnSentiment"
-        script: "predict/finsent.py"
+        script: "finsent.py"
         description: "Tekstin sentimenttianalyysi"
       - title: "lemmarank"
         script: "lemmarank.py"
