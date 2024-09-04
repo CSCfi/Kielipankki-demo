@@ -48,6 +48,7 @@
   ansible.builtin.pip:
     break_system_packages: true
     name:
+      - scipy # the ubuntu package is conflicting with the numpy version there
       - numpy
       - torch
       - textract
@@ -80,6 +81,7 @@
     - /var/log/kielipankki-tools
     - /usr/local/share/histner
     - /usr/local/share/ofitwol
+    - /usr/local/share/transducers
 
 - name: Set /var/www ownership
   ansible.builtin.file:
@@ -150,6 +152,9 @@
     - dest: /var/www/cgi-bin
       src: https://a3s.fi/demo_server_blobs/fiwn.tar.gz
       creates: /var/www/cgi-bin/fiwn/fiwn.cgi
+    - dest: /usr/local/share/transducers/
+      src: https://a3s.fi/demo_server_blobs/compiled_pmatch.tar.gz
+      creates: /usr/local/share/transducers/ttp2.pmatch
 
   tags: content
 
@@ -218,9 +223,26 @@
     owner: www-data
     group: www-data
     remote_src: true
-    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/make_pmscript.py"
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/{{ item }}"
     dest: /usr/local/share/kielipankki_demo_python/
   tags: content
+  loop:
+    - make_pmscript.py
+    - divergence.py
+    - aleksanteri-instituutti_wordfreq.txt
+    - bio_ja_ymparistot_wordfreq.txt
+    - divergence.py
+    - elainlaaketiede_wordfreq.txt
+    - farmasia_wordfreq.txt
+    - humanistinen_wordfreq.txt
+    - kayttaytymistiede_wordfreq.txt
+    - laaketiede_wordfreq.txt
+    - maajametsatiede_wordfreq.txt
+    - matemaattis_wordfreq.txt
+    - newspaper_wordfreq.txt
+    - oikeustiede_wordfreq.txt
+    - teologinen_wordfreq.txt
+    - valtiotiede_wordfreq.txt
   
 - name: Build and install ofitwol
   ansible.builtin.command:
