@@ -62,6 +62,7 @@ categories:
       - title: "XML-strip"
         script: "xml-strip.py"
         description: "Juoksevan tekstin eristäminen XML-dokumentista jatkokäsittelyä varten"
-      - title: "Latauspalvelu"
-        script: "../download/index.html"
-        description: "Kehitysvaiheessa olevien aineistojen (sanavektorit) latauspalvelu"
+      # - title: "Latauspalvelu"
+      #   script: "../download/index.html"
+      #   description: "Kehitysvaiheessa olevien aineistojen (sanavektorit) lataus
+      #   palvelu"
