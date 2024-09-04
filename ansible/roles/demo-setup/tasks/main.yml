@@ -80,7 +80,6 @@
     - /var/log/kielipankki-tools
     - /usr/local/share/histner
     - /usr/local/share/ofitwol
-    - /usr/local/share/predict
 
 - name: Set /var/www ownership
   ansible.builtin.file:
