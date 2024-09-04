@@ -116,25 +116,58 @@
     - url: https://korp.csc.fi/download/finnish-tagtools/v1.6/finnish-tagtools-1.6.0.zip
       creates: "/home/{{ ansible_user }}/finnish-tagtools-1.6.0"
 
-- name: Fetch and unpack sentiment classifier package
-  become_user: www-data
+- name: Fetch and unpack our own additional packages
+#  become_user: www-data
   ansible.builtin.unarchive:
     remote_src: yes
-    dest: "/usr/share/predict/"
-    src: https://a3s.fi/demo_server_blobs/predict.tar.xz
-    creates: "/usr/share/predict/snapshot/"
+    dest: "{{ item.dest }}"
+    src: "{{ item.src }}"
+    creates: "{{ item.creates }}"
+    owner: www-data
+    group: www-data
+  loop:
+    - dest: /usr/local/share/
+      src: https://a3s.fi/demo_server_blobs/predict.tar.gz
+      creates: /usr/local/share/predict/snapshot/
+    - dest: "/usr/local/share/histner/"
+      src: https://a3s.fi/demo_server_blobs/histner.tar.gz"
+      creates: "/usr/local/share/histner/hist-model-loc-prs.ser.gz"
+    - dest: /var/www/cgi-bin/
+      src: https://a3s.fi/demo_server_blobs/omor.tar.gz
+      creates: /var/www/cgi-bin/omor/
+    - dest: /var/www/cgi-bin/
+      src: https://a3s.fi/demo_server_blobs/hfst-tagger.tar.gz
+      creates: /var/www/cgi-bin/hfst-tagger/
+    - dest: /var/www/
+      src: https://a3s.fi/demo_server_blobs/termipankki.tar.gz
+      creates: /var/www/termipankki/
+    - dest: /var/www/
+      src: https://a3s.fi/demo_server_blobs/ylilauta.tar.bz2
+      creates: /var/www/ylilauta/
+    - dest: /usr/local
+      src: https://a3s.fi/demo_server_blobs/vecs.tar.gz
+      creates: /usr/local/share/vecs/all_vec.bin
+    - dest: /var/www/cgi-bin
+      src: https://a3s.fi/demo_server_blobs/fiwn.tar.gz
+      creates: /var/www/cgi-bin/fiwn/fiwn.cgi
 
-- name: Unpack histner
-  ansible.builtin.unarchive:
-    remote_src: yes
-    dest: "/usr/local/share/histner/"
-    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/histner.tar.gz"
-    creates: "/usr/local/share/histner/hist-model-loc-prs.ser.gz"
+  tags: content
 
 - name: Build word embeddings library
   ansible.builtin.command:
     chdir: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/"
     cmd: make
+    creates: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/_embutils.so"
+
+- name: Install word embeddings library
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/{{ item }}"
+    dest: /var/www/cgi-bin
+    mode: 0755
+  loop:
+    - embutils.py
+    - _embutils.so
 
 - name: Build HFST
   ansible.builtin.command:
@@ -171,6 +204,24 @@
     mode: 0755
   tags: content
 
+- name: Install sentiment modeling libs and data
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/predict"
+    dest: /usr/local/share/
+  tags: content
+
+- name: Install additional Python libs used by cgi-bin
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/make_pmscript.py"
+    dest: /usr/local/share/kielipankki_demo_python/
+  tags: content
+  
 - name: Build and install ofitwol
   ansible.builtin.command:
     chdir: "{{ item.dir }}"
