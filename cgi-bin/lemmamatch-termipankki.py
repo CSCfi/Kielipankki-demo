@@ -7,6 +7,8 @@ import cgi
 import time
 import hashlib
 
+from kpdemos import *
+
 sys.path.append(demo_lib_dir)
 from make_pmscript import make_script
 import requests
@@ -16,7 +18,6 @@ import cgitb
 
 cgitb.enable()
 
-from kpdemos import *
 
 space_eating_punct = ".!?,;"
 
