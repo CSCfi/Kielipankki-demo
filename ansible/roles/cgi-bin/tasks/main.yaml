@@ -1,6 +1,5 @@
 ---
 - name: Write host file
-  become: true
   ansible.builtin.template:
     src: templates/host.txt.j2
     dest: "/var/www/cgi-bin/host.txt"
@@ -8,7 +7,6 @@
     group: www-data
 
 - name: Copy cgi-bin contents
-  become: true
   ansible.builtin.copy:
     owner: www-data
     group: www-data
@@ -17,8 +15,180 @@
     dest: /var/www/cgi-bin
   tags: content
 
+- name: Fetch git repos
+  become_user: "{{ ansible_user }}"
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "/home/{{ ansible_user }}/{{ item.dir }}"
+  loop:
+    - dir: ofitwol
+      repo: https://github.com/CSCfi/Kielipankki-ofitwol.git
+    - dir: Kielipankki-demo
+      repo: https://github.com/CSCfi/Kielipankki-demo.git
+    - dir: conllu-viewer
+      repo: https://github.com/CSCfi/Kielipankki-conllu-viewer.git
+    - dir: nlp-tools
+      repo: https://github.com/Traubert/nlp-tools.git
+  tags: content
+
+- name: Fetch software releases
+  ansible.builtin.unarchive:
+    remote_src: yes
+    dest: "/home/{{ ansible_user }}/"
+    src: "{{ item.url }}"
+    creates: "{{ item.creates }}"
+  loop:
+    - url: https://github.com/hfst/hfst/releases/download/v3.16.0/hfst-3.16.0.tar.bz2
+      creates: "/home/{{ ansible_user }}/hfst-3.16.0"
+    - url: https://korp.csc.fi/download/finnish-tagtools/v1.6/finnish-tagtools-1.6.0.zip
+      creates: "/home/{{ ansible_user }}/finnish-tagtools-1.6.0"
+
+- name: Fetch and unpack our own additional packages
+  ansible.builtin.unarchive:
+    remote_src: yes
+    dest: "{{ item.dest }}"
+    src: "{{ item.src }}"
+    creates: "{{ item.creates }}"
+    owner: www-data
+    group: www-data
+  loop:
+    - dest: /usr/local/share/
+      src: https://a3s.fi/demo_server_blobs/predict.tar.gz
+      creates: /usr/local/share/predict/snapshot/
+    - dest: "/usr/local/share/histner/"
+      src: https://a3s.fi/demo_server_blobs/histner.tar.gz"
+      creates: "/usr/local/share/histner/hist-model-loc-prs.ser.gz"
+    - dest: /var/www/cgi-bin/
+      src: https://a3s.fi/demo_server_blobs/omor.tar.gz
+      creates: /var/www/cgi-bin/omor/
+    - dest: /var/www/cgi-bin/
+      src: https://a3s.fi/demo_server_blobs/hfst-tagger.tar.gz
+      creates: /var/www/cgi-bin/hfst-tagger/
+    - dest: /var/www/
+      src: https://a3s.fi/demo_server_blobs/termipankki.tar.gz
+      creates: /var/www/termipankki/
+    - dest: /var/www/
+      src: https://a3s.fi/demo_server_blobs/ylilauta.tar.bz2
+      creates: /var/www/ylilauta/
+    - dest: /usr/local
+      src: https://a3s.fi/demo_server_blobs/vecs.tar.gz
+      creates: /usr/local/share/vecs/all_vec.bin
+    - dest: /var/www/cgi-bin
+      src: https://a3s.fi/demo_server_blobs/fiwn.tar.gz
+      creates: /var/www/cgi-bin/fiwn/fiwn.cgi
+    - dest: /usr/local/share/transducers/
+      src: https://a3s.fi/demo_server_blobs/compiled_pmatch.tar.gz
+      creates: /usr/local/share/transducers/ttp2.pmatch
+
+  tags: content
+
+- name: Build word embeddings library
+  ansible.builtin.command:
+    chdir: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/"
+    cmd: make
+    creates: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/_embutils.so"
+
+- name: Install word embeddings library
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/home/{{ ansible_user }}/nlp-tools/word_embeddings/c++/{{ item }}"
+    dest: /var/www/cgi-bin
+    mode: 0755
+  loop:
+    - embutils.py
+    - _embutils.so
+
+- name: Build HFST
+  ansible.builtin.command:
+    chdir: "/home/{{ ansible_user }}/hfst-3.16.0/"
+    cmd: "{{ item }}"
+  loop:
+    - "autoreconf -i"
+    - >
+      ./configure --with-unicode-handler=glib 
+      --without-sfst 
+      --without-foma 
+    - "make -j 4"
+    - "make install-strip"
+    - ldconfig
+
+- name: Build HFST's Python bindings
+  ansible.builtin.command:
+    chdir: "/home/{{ ansible_user }}/hfst-3.16.0/python"
+    cmd: "{{ item }}"
+  loop:
+    - "python3 setup.py build_ext --inplace"
+    - "python3 setup.py install"
+
+- name: Install finnish-tagtools
+  ansible.builtin.command:
+    chdir: "/home/{{ ansible_user }}/finnish-tagtools-1.6.0/"
+    cmd: "make install"
+
+- name: Install scripts
+  ansible.builtin.copy:
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/scripts/"
+    dest: /usr/local/bin
+    mode: 0755
+  tags: content
+
+- name: Install sentiment modeling libs and data
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/predict"
+    dest: /usr/local/share/
+  tags: content
+
+- name: Install additional Python libs used by cgi-bin
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/{{ item }}"
+    dest: /usr/local/share/kielipankki_demo_python/
+  tags: content
+  loop:
+    - make_pmscript.py
+    - divergence.py
+    - aleksanteri-instituutti_wordfreq.txt
+    - bio_ja_ymparistot_wordfreq.txt
+    - divergence.py
+    - elainlaaketiede_wordfreq.txt
+    - farmasia_wordfreq.txt
+    - humanistinen_wordfreq.txt
+    - kayttaytymistiede_wordfreq.txt
+    - laaketiede_wordfreq.txt
+    - maajametsatiede_wordfreq.txt
+    - matemaattis_wordfreq.txt
+    - newspaper_wordfreq.txt
+    - oikeustiede_wordfreq.txt
+    - teologinen_wordfreq.txt
+    - valtiotiede_wordfreq.txt
+
+- name: Build and install ofitwol
+  ansible.builtin.command:
+    chdir: "{{ item.dir }}"
+    cmd: "{{ item.cmd }}"
+  loop:
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/rules"
+      cmd: make
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: make ofitwol.ofst
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: "cp ofitwol.ofst /usr/local/share/ofitwol/"
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: make ofimphon.ofst
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: "cp ofimphon.ofst /usr/local/share/ofitwol/"
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: make ofiguess.ofst
+    - dir: "/home/{{ ansible_user }}/ofitwol/ofitwol/ofi2"
+      cmd: "cp ofiguess.ofst /usr/local/share/ofitwol/"
+
 - name: Copy conllu-viewer UI dependencies
-  become: true
   ansible.builtin.copy:
     owner: www-data
     group: www-data
