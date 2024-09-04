@@ -7,9 +7,11 @@ import time
 import hashlib
 import os
 import cgitb
+
 cgitb.enable()
 
 from kpdemos import *
+
 
 def print_content():
     time_start = time.time()
@@ -18,24 +20,28 @@ def print_content():
     result = ""
     if "file" in form and form["file"].filename != "":
         try:
-            output, session_key, filename = ocr_from_file(form["file"], form["lang"].value)
+            output, session_key, filename = ocr_from_file(
+                form["file"], form["lang"].value
+            )
         except Exception as ex:
             log(str(ex))
         write_docx(output.decode("utf-8"), session_key, "OCR result")
         result += "<p>Result:</p>\n"
-        result += '''
+        result += """
         <div class="row">
         <div class="col-md-auto">
-        <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.docx" download="ocr_result.docx" role="button">Download .docx</a>
+        <a class="btn btn-info" href="{html_root}/tmp/{filename}.docx" download="ocr_result.docx" role="button">Download .docx</a>
         </div>
         </div>
-        '''.format(html_root = hostname, filename = session_key)
+        """.format(
+            html_root=hostname, filename=session_key
+        )
         if not filename.endswith("pdf"):
-            result += '<img src=' + hostname + '/kielipankki-tools/tmp/' + filename + '/>\n'
+            result += "<img src=" + hostname + "/tmp/" + filename + "/>\n"
         result += text_to_html(output.decode("utf-8"))
     body = wrap_in_tags("OCR with tesseract demo", "h2")
-    body += '<h6>Recognize text from images in multiple languages.</h6>'
-    body += '''
+    body += "<h6>Recognize text from images in multiple languages.</h6>"
+    body += """
 <a href="#help" data-toggle="collapse">Show help</a>
 <div class="collapse" id="help">
   <div class="card" style="width: 40rem;">
@@ -47,8 +53,8 @@ def print_content():
     </div>
   </div>
 </div>
-'''
-    body += '''
+"""
+    body += """
 <form method="post" action="/cgi-bin/{scriptname}" enctype="multipart/form-data">
   <div class="form-group">
     <div class="row">
@@ -79,9 +85,20 @@ def print_content():
     <p><small>Page generated in {TIME_SPENT:.2f} seconds</small></p>
   </div>
 </div>
-'''.format(select_langs = open('tesseract_langs_select.txt', encoding="utf-8").read() , scriptname = os.path.basename(sys.argv[0]), content = result, TIME_SPENT = time.time() - time_start)
+""".format(
+        select_langs=open("tesseract_langs_select.txt", encoding="utf-8").read(),
+        scriptname=os.path.basename(sys.argv[0]),
+        content=result,
+        TIME_SPENT=time.time() - time_start,
+    )
 
-    sys.stdout.buffer.write(wrap_html(make_head(title = 'OCR with tesseract demo'), wrap_in_tags(body, 'div', attribs='class="container pt-1"', oneline = False)).encode("utf-8"))
+    sys.stdout.buffer.write(
+        wrap_html(
+            make_head(title="OCR with tesseract demo"),
+            wrap_in_tags(body, "div", attribs='class="container pt-1"', oneline=False),
+        ).encode("utf-8")
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print_content()
