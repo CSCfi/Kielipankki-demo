@@ -7,7 +7,9 @@ import cgi
 import time
 import hashlib
 
-sys.path.append("/var/www/kielipankki-tools/")
+from kpdemos import *
+
+sys.path.append(demo_lib_dir)
 from make_pmscript import make_script
 import requests
 import json
@@ -15,8 +17,6 @@ import json
 import cgitb
 
 cgitb.enable()
-
-from kpdemos import *
 
 space_eating_punct = ".!?,;:"
 
@@ -128,8 +128,7 @@ def process_form(form):
             lemmalist_script = make_script(lemmalist, opts)
             debuginfo += lemmalist_script + "<br>\n"
             lemmalist_pmatch_filename = (
-                wrkdir
-                + "/tmp/"
+                tmpdir
                 + session_key.hexdigest()
                 + "_"
                 + str(i + 1)
@@ -146,7 +145,7 @@ def process_form(form):
     inputstring = form["input"].value.strip().encode("utf-8")
     try:
         process = Popen(
-            [path_to_tagtools + "/finnish-postag"], stdin=PIPE, stdout=PIPE, stderr=PIPE
+            ["/usr/local/bin/finnish-postag"], stdin=PIPE, stdout=PIPE, stderr=PIPE
         )
         postag_out, err = process.communicate(input=inputstring)
     except Exception as ex:
@@ -319,12 +318,12 @@ def print_content():
         download_buttons = """
 <div class="row">
   <div class="col-4">
-    <a class="btn btn-info" role="button" href="{html_root}/kielipankki-tools/tmp/{filename}.txt", download="lemmamatch_result.txt">Download .txt result</a>
-    <a class="btn btn-info" role="button" href="{html_root}/kielipankki-tools/tmp/{filename}.docx", download="lemmamatch_result.docx">Download .docx result</a>
+    <a class="btn btn-info" role="button" href="{html_root}/{filename}.txt", download="lemmamatch_result.txt">Download .txt result</a>
+    <a class="btn btn-info" role="button" href="{html_root}/{filename}.docx", download="lemmamatch_result.docx">Download .docx result</a>
   </div>
 </div>
         """.format(
-            html_root=hostname, filename=session_key
+            html_root=tmpdir_uri, filename=session_key
         )
     body += """
 <a href="#help" data-toggle="collapse">Show help</a>
