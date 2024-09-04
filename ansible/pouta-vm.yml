@@ -9,7 +9,6 @@
       tags: create_instances
   vars:
     instance_name: 'demo'
-    vm_name_postfix: 'prod'
     pouta_instance_name: "{{ instance_name }}-{{ vm_name_postfix }}"
     project_sg: "demo-sg"
     project_security_groups: "default,{{ project_sg }}"
