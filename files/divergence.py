@@ -71,7 +71,7 @@ def get_divergences(lemmalist):
         thisseq = [dists[i][x] if x in dists[i] else minprob for x in allwords]
         kl_div = scipy.stats.entropy(seq, thisseq)
         name = dist_filenames[i]
-        name = name[name.rindex("/") + 1 : name.index("_")]
+        name = name[name.rindex("/") + 1 : name.rindex("_")]
         retval.append((name, float(kl_div)))
     retval.sort(key=lambda x: x[1])
     return retval
