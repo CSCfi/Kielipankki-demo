@@ -16,6 +16,7 @@
       - gettext
       - git
       - lame
+      - libcgi-pm-perl
       - libglib2.0-dev
       - libicu-dev
       - libjpeg-dev
