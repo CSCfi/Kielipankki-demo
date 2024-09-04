@@ -70,7 +70,7 @@ def indent(n):
     return lambda x: n * " " + x
 
 
-def make_script(lemmalist, specs=None, vecdir="/usr/local/share/vecs"):
+def make_script(lemmalist, specs=None, vecdir="/usr/local/share/vecs/"):
     vectorfile = vecdir + "all_vec.bin"
     if specs != None:
         if "vectorfile" in specs:

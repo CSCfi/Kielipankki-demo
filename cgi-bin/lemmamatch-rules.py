@@ -125,7 +125,7 @@ def process_form(form):
         for i, lemmalist in enumerate(lemmalists):
             opts = {}
             opts["vectorfile"] = vectorfile
-            lemmalist_script = make_script(lemmalist, opts)
+            lemmalist_script = make_script(lemmalist, specs=opts, vecdir=vector_dir)
             debuginfo += lemmalist_script + "<br>\n"
             lemmalist_pmatch_filename = (
                 tmpdir
