@@ -115,8 +115,7 @@ def process_form(form):
             lemmalist_script = make_script(lemmalist, specs=opts, vecdir=vector_dir)
             debuginfo += lemmalist_script + "<br>\n"
             lemmalist_pmatch_filename = (
-                wrkdir
-                + "/tmp/"
+                tmpdir
                 + session_key.hexdigest()
                 + "_"
                 + str(i + 1)
@@ -298,12 +297,12 @@ def print_content():
         download_buttons = """
 <div class="row">
   <div class="col-4">
-    <a class="btn btn-info" role="button" href="{html_root}/kielipankki-tools/tmp/{filename}.txt", download="lemmamatch_result.txt">Download .txt result</a>
-    <a class="btn btn-info" role="button" href="{html_root}/kielipankki-tools/tmp/{filename}.docx", download="lemmamatch_result.docx">Download .docx result</a>
+    <a class="btn btn-info" role="button" href="{html_root}/{filename}.txt", download="lemmamatch_result.txt">Download .txt result</a>
+    <a class="btn btn-info" role="button" href="{html_root}/{filename}.docx", download="lemmamatch_result.docx">Download .docx result</a>
   </div>
 </div>
         """.format(
-            html_root=hostname, filename=session_key
+            html_root=tmpdir_uri, filename=session_key
         )
     body += """
 <a href="#help" data-toggle="collapse">Show help</a>
