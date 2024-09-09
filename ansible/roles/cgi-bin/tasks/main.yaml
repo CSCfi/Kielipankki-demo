@@ -29,6 +29,8 @@
       repo: https://github.com/CSCfi/Kielipankki-conllu-viewer.git
     - dir: nlp-tools
       repo: https://github.com/Traubert/nlp-tools.git
+    - dir: anee-lexical-portal # Only until these get migrated
+      repo: https://github.com/Traubert/anee-lexical-portal
   tags: content
 
 - name: Fetch software releases
