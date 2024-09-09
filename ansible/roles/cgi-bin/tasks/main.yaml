@@ -81,8 +81,50 @@
     - dest: /usr/local/share/transducers/
       src: https://a3s.fi/demo_server_blobs/compiled_pmatch.tar.gz
       creates: /usr/local/share/transducers/ttp2.pmatch
-
   tags: content
+
+- name: Include ANEE vars
+  ansible.builtin.include_vars: anee_vars.yaml
+
+- name: Install ANEE portal packages
+  ansible.builtin.unarchive:
+    owner: www-data
+    group: www-data
+    remote_src: yes
+    dest: /var/www/anee
+    src: "{{ 'https://a3s.fi/kielipankki_anee_portal_packages/' + item + '.tar.gz' }}"
+    creates: "/var/www/anee/{{ item }}"
+  loop:
+    "{{ anee_package_names }}"
+
+- name: Install ANEE gexf-js-base
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: yes
+    dest: /var/www/resources/gexf-js-base
+    src: "/home/{{ ansible_user }}/anee-lexical-portal/gexf-js-base"
+
+- name: Link ANEE portal packages to gexf-js installation
+  ansible.builtin.command:
+    chdir: "/var/www/resources/gexf-js-base"
+    argv:
+      - "/home/{{ ansible_user }}/anee-lexical-portal/link-portal-package.sh"
+      - "/var/www/anee/{{ item }}"
+  loop:
+    "{{ anee_package_names }}"
+
+- name: Make extra ANEE links
+  ansible.builtin.command:
+    argv:
+      - ln
+      - "-sf"
+      - "/var/www/anee/{{ item }}"
+      - "/var/www/{{ item }}"
+    creates:
+      - "/var/www/{{ item }}"
+  loop:
+    "{{ anee_package_names }}"
 
 - name: Build word embeddings library
   ansible.builtin.command:

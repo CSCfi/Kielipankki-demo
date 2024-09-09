@@ -78,6 +78,8 @@
   loop:
     - /var/www/cgi-bin
     - /var/www/tmp
+    - /var/www/anee
+    - /var/www/resources
     - /var/log/kielipankki-tools
     - /usr/local/share/histner
     - /usr/local/share/ofitwol
