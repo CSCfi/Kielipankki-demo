@@ -9,3 +9,16 @@
     dest: /var/www/index.html
     owner: www-data
     group: www-data
+
+- name: Install favicons
+  become: true
+  ansible.builtin.copy:
+    remote_src: yes
+    dest: /var/www/resources/
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/files/{{ item }}"
+    owner: www-data
+    group: www-data
+  loop:
+    - favicon-16x16.png
+    - favicon-32x32.png
+    - favicon-96x96.png
