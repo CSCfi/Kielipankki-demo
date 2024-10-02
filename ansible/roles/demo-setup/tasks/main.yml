@@ -91,3 +91,5 @@
     group: www-data
     recurse: true
     path: /var/www
+    follow: false
+    # setting true causes an infinite recursion with the portal symlinks, sigh
