@@ -50,7 +50,7 @@ def print_content():
         #          'Content-Type': 'application/octet-stream'}
 
         # audiobytes = inputfile.file.read()
-        submit_url = 'http://kielipankki.rahtiapp.fi/audio/align/fi/submit_file'
+        submit_url = "http://kielipankki.2.rahtiapp.fi/audio/align/fi/submit_file"
         try:
             response = requests.post(submit_url, files = files)
         except exception as e:
@@ -61,8 +61,8 @@ def print_content():
         target_params = '?job=' + jobid
         time.sleep(1)
     if jobid is not None:
-        query_url = 'http://kielipankki.rahtiapp.fi/audio/align/fi/query_job'
-        response = requests.post(query_url, data = jobid)
+        query_url = "http://kielipankki.2.rahtiapp.fi/audio/align/fi/query_job"
+        response = requests.post(query_url, data=jobid)
         log(response.text)
         j = json.loads(response.text)
         if "status" in j and j["status"] == "pending":

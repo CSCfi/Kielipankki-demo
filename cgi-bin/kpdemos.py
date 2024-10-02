@@ -470,7 +470,7 @@ def naive_tokenize(line):
     return retval
 
 
-kielipankki_texttools_api_url = "http://kielipankki.rahtiapp.fi/text/fi"
+kielipankki_texttools_api_url = "http://kielipankki.2.rahtiapp.fi/text/fi"
 import requests
 import json
 
