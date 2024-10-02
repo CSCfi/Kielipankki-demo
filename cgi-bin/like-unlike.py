@@ -157,11 +157,11 @@ def print_content():
             result += """
             <div class="row">
             <div class="col-md-auto">
-            <a class="btn btn-info" href="{html_root}/tmp/{filename}.txt" download="like_unlike.txt" role="button">Download text</a>
+            <a class="btn btn-info" href="{html_root}/{filename}.txt" download="like_unlike.txt" role="button">Download text</a>
             </div>
             </div>
             """.format(
-                html_root=hostname, filename=session_key
+                html_root=tmpdir_uri, filename=session_key
             )
             result += make_table(out, header=column_names) + "\n"
         except Exception as ex:

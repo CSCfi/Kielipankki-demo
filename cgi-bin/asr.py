@@ -85,9 +85,9 @@ def print_content():
                 result += """
                 <div class="row">
                 <div class="col-md-auto py-4">
-                <a class="btn btn-info" href="https://kielipankki.fi/tools/demo/kielipankki-tools/tmp/{filename}.tsv" download="asr_result.tsv" role="button">Download TSV</a></div></div>
+                <a class="btn btn-info" href="{tmpdir_uri}/{filename}.tsv" download="asr_result.tsv" role="button">Download TSV</a></div></div>
             """.format(
-                    html_root=hostname, filename=session_key
+                    html_root=tmpdir_uri, filename=session_key
                 )
 
             json_result = j["result"]

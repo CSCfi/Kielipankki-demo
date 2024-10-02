@@ -72,8 +72,8 @@ def print_content():
 
         out_utf8 = "\n".join(["\t".join([word for word in row]) for row in out_rows])
 
-        excel_download_button_string = '<a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="ofitwol.xlsx" role="button">Download Excel spreadsheet</a>'.format(
-            html_root=hostname, filename=session_key
+        excel_download_button_string = '<a class="btn btn-info" href="{html_root}/{filename}.xlsx" download="ofitwol.xlsx" role="button">Download Excel spreadsheet</a>'.format(
+            html_root=tmpdir_uri, filename=session_key
         )
         try:
             write_excel(out_rows, session_key, "Output from fintok")
@@ -83,12 +83,12 @@ def print_content():
         result += """
         <div class="row">
         <div class="col-md-auto">
-        <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.txt" download="tokenized.txt" role="button">Download text</a>
+        <a class="btn btn-info" href="{html_root}/{filename}.txt" download="tokenized.txt" role="button">Download text</a>
         {excel_button_text}
         </div>
         </div>
         """.format(
-            html_root=hostname,
+            html_root=tmpdir_uri,
             filename=session_key,
             excel_button_text=excel_download_button_string,
         )

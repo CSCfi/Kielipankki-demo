@@ -65,12 +65,12 @@ def print_content():
         result += """
         <div class="row">
         <div class="col-md-auto">
-        <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.txt" download="tokenized.txt" role="button">Download text</a>
-        <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="tokenized.xlsx" role="button">Download Excel spreadsheet</a>
+        <a class="btn btn-info" href="{html_root}/{filename}.txt" download="tokenized.txt" role="button">Download text</a>
+        <a class="btn btn-info" href="{html_root}/{filename}.xlsx" download="tokenized.xlsx" role="button">Download Excel spreadsheet</a>
         </div>
         </div>
         """.format(
-            html_root=hostname, filename=session_key
+            html_root=tmpdir_uri, filename=session_key
         )
         result += make_table(out_rows, header=column_names) + "\n"
     body = wrap_in_tags("finnish-tokenize demo", "h2")

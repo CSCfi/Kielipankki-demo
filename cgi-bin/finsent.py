@@ -90,12 +90,12 @@ def print_content():
             result += """
 <div class="row">
   <div class="col-md-auto">
-    <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.tsv" download="finnsentiment_result.tsv" role="button">Download TSV</a>
-    <a class="btn btn-info" href="{html_root}/kielipankki-tools/tmp/{filename}.xlsx" download="finnsentiment_result.xlsx" role="button">Download Excel spreadsheet</a>
+    <a class="btn btn-info" href="{html_root}/{filename}.tsv" download="finnsentiment_result.tsv" role="button">Download TSV</a>
+    <a class="btn btn-info" href="{html_root}/{filename}.xlsx" download="finnsentiment_result.xlsx" role="button">Download Excel spreadsheet</a>
   </div>
 </div>
             """.format(
-                html_root=hostname, filename=session_key
+                html_root=tmpdir_uri, filename=session_key
             )
             column_names = ("Sentiment", "Text")
             result += make_table(texts_and_results, header=column_names) + "\n"

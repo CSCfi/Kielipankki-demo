@@ -90,13 +90,13 @@ def print_content():
             result += """
             <div class="row">
             <div class="col-md-auto py-4">
-            <a class="btn btn-info" href="https://kielipankki.fi/tools/demo/kielipankki-tools/tmp/{filename}.ctm" download="align_result.ctm" role="button">Download ctm</a></div>
+            <a class="btn btn-info" href="{html_root}/{filename}.ctm" download="align_result.ctm" role="button">Download ctm</a></div>
             <div class="col-md-auto py-4">
-            <a class="btn btn-info" href="https://kielipankki.fi/tools/demo/kielipankki-tools/tmp/{filename}.eaf" download="align_result.eaf" role="button">Download eaf</a></div>
+            <a class="btn btn-info" href="{html_root}/{filename}.eaf" download="align_result.eaf" role="button">Download eaf</a></div>
             <div class="col-md-auto py-4">
-            <a class="btn btn-info" href="https://kielipankki.fi/tools/demo/kielipankki-tools/tmp/{filename}.TextGrid" download="align_result.TextGrid" role="button">Download TextGrid</a></div></div>
+            <a class="btn btn-info" href="{html_root}/{filename}.TextGrid" download="align_result.TextGrid" role="button">Download TextGrid</a></div></div>
             """.format(
-                html_root=hostname, filename=session_key
+                html_root=tmpdir_uri, filename=session_key
             )
 
             result += (
