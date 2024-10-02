@@ -62,7 +62,6 @@ def print_content():
             response = requests.post(submit_url, files=files)
         except exception as e:
             result += str(e)
-        log(response.text)
         job = json.loads(response.text)
         jobid = job["jobid"]
         target_params = "?job=" + jobid
@@ -70,16 +69,16 @@ def print_content():
     if jobid is not None:
         query_url = "http://kielipankki.2.rahtiapp.fi/audio/align/fi/query_job"
         response = requests.post(query_url, data=jobid)
-        log(response.text)
         j = json.loads(response.text)
         if "status" in j and j["status"] == "pending":
             result = "<p>In queue..</p>"
         elif "status" in j and j["status"] == "done":
             done = True
             session_key = jobid
-            ctm = j["results"]["ctm"]
-            eaf = j["results"]["eaf"]
-            TextGrid = j["results"]["TextGrid"]
+            results = json.loads(j["results"])
+            ctm = results["ctm"]
+            eaf = results["eaf"]
+            TextGrid = results["TextGrid"]
             ctm_words = ctm.split("\n")
             n_words = len(ctm_words)
             preview_words = [word.split() for word in ctm_words[:10]]
