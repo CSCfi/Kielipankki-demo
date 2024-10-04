@@ -6,15 +6,6 @@
     owner: www-data
     group: www-data
 
-- name: Copy cgi-bin contents
-  ansible.builtin.copy:
-    owner: www-data
-    group: www-data
-    remote_src: true
-    src: "/home/{{ ansible_user }}/Kielipankki-demo/cgi-bin/"
-    dest: /var/www/cgi-bin
-  tags: content
-
 - name: Fetch git repos
   become_user: "{{ ansible_user }}"
   ansible.builtin.git:
@@ -31,6 +22,15 @@
       repo: https://github.com/Traubert/nlp-tools.git
     - dir: anee-lexical-portal # Only until these get migrated
       repo: https://github.com/Traubert/anee-lexical-portal
+  tags: content
+
+- name: Copy cgi-bin contents
+  ansible.builtin.copy:
+    owner: www-data
+    group: www-data
+    remote_src: true
+    src: "/home/{{ ansible_user }}/Kielipankki-demo/cgi-bin/"
+    dest: /var/www/cgi-bin
   tags: content
 
 - name: Fetch software releases
