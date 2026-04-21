@@ -177,7 +177,7 @@ def ocr_from_file(form_file, lang):
 
 
 def make_doctype():
-    return "<!doctype html>\n"  # "Content-type: text/html\n\n<!doctype html>\n"
+    return "Content-type: text/html\n\n<!doctype html>\n"
 
 
 def text_to_html(text):
