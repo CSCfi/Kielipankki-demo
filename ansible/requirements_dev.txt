@@ -1,5 +1,5 @@
 python-openstackclient # ==3.14.3
 #shade
-ansible
+ansible>=14.3
 #dnspython
 openstacksdk #<=0.98.999
